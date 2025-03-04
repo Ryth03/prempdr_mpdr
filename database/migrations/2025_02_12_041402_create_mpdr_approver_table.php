@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('mpdr_approvers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->string('nik');
-            $table->string('name');
+            $table->string('user_nik');
+            $table->string('approver_nik');
+            $table->string('approver_name');
+            $table->string('approver_status');
             $table->timestamps();
-            $table->foreign('form_id')->references('id')->on('mpdr_forms')->onDelete('cascade');
         });
     }
 

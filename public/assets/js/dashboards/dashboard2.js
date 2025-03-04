@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
         },
     };
 
-    var chart = new ApexCharts(document.querySelector("#revenue-chart"), options);
+    // var chart = new ApexCharts(document.querySelector("#revenue-chart"), options);
     chart.render();
 
 

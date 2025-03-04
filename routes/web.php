@@ -128,6 +128,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/no_reg', [MpdrController::class, 'noReg'])->name('mpdr.noReg');
 
         Route::get('/template', [MpdrController::class, 'template'])->name('mpdr.template');
+        Route::POST('/updateApproverOrder', [MpdrController::class, 'updateApproverOrder'])->name('mpdr.approver.update.order');
+        Route::get('/getSelectedApproverList', [MpdrController::class, 'getSelectedApproverList'])->name('mpdr.selected.approver.list');
+        Route::get('/getApproverListData', [MpdrController::class, 'getApproverListData'])->name('mpdr.approver.list.data');
         Route::get('/getFormList', [MpdrController::class, 'getFormList'])->name('mpdr.form.list');
         Route::get('/getFormData', [MpdrController::class, 'getFormData'])->name('mpdr.form.data');
 
@@ -162,6 +165,7 @@ Route::group(['middleware' => ['role:super-admin|admin']], function() {
     Route::put('roles/{roleId}/give-permissions', [RoleController::class, 'givePermissionToRole']);
 
     Route::resource('users', UserController::class);
+    Route::get('getUsersData', [UserController::class, 'getUsersData'])->name('get.users.data');
     Route::get('users/{userId}/delete', [UserController::class, 'destroy']);
 
 });

@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\PREMPDR\PreMpdrForm;
-use App\Models\PREMPDR\PreMpdrApprovedDetail;
 use App\Models\PREMPDR\PreMpdrRevision;
 
 class PreMpdrController extends Controller
@@ -387,12 +386,6 @@ class PreMpdrController extends Controller
         })
         ->get();
         
-        // $approval = PreMpdrApprovedDetail::whereHas('user', function ($query) use($user){
-        //     $query->where('approver', $user->nik);
-        // })
-        // ->get();
-        // DB::raw('(SELECT COUNT(*) + 1 FROM pre_mpdr_approved_details WHERE pre_mpdr_approved_details.form_id = pre_mpdr_forms.id AND status != "pending")')
-        // return response()->json($approval);
         if($form){
             return response()->json($form);
         }

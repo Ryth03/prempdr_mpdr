@@ -274,7 +274,6 @@
     {{-- <script src="{{ asset('assets') }}/npm/iconify-icon%401.0.8/dist/iconify-icon.min.js"></script> --}}
     {{-- <script src="{{ asset('assets') }}/libs/owl.carousel/dist/owl.carousel.min.js"></script> --}}
     {{-- <script src="{{ asset('assets') }}/libs/apexcharts/dist/apexcharts.min.js"></script> --}}
-    <script src="{{ asset('assets') }}/js/dashboards/dashboard2.js"></script>
 
     @stack('scripts')
 </body>

@@ -444,7 +444,7 @@
             const no_reg = @json($no_reg);
             console.log("MELAKUKAN FETCH DATA:", no_reg);
 
-            // fetch data form
+            // ajax data form
             $.ajax({
                 url: '{{ route('prempdr.form.data') }}', // URL ke controller
                 method: 'GET',

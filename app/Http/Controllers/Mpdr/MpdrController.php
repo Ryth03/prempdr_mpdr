@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\MPDR\MpdrForm;
+use App\Models\MPDR\MpdrApprover;
 use App\Models\MPDR\MpdrRevision;
 
 class MpdrController extends Controller
@@ -211,6 +212,7 @@ class MpdrController extends Controller
     public function approver()
     {
         $users = User::role('approver')->get();
+        confirmDelete();
         return view('page.mpdr.approver-mpdr');
     }
 
@@ -276,5 +278,63 @@ class MpdrController extends Controller
         }
 
         return response()->json("Tidak ada Form");
+    }
+
+    public function getApproverListData()
+    {
+        $approver = User::role('approver')->where('status', 'Active')->get();
+        if($approver){
+            return response()->json($approver);
+        }
+
+        return response()->json("Tidak ada data");
+    }
+    
+    public function getSelectedApproverList()
+    {
+            $user_nik = Auth::user()->nik;
+            $approverList = MpdrApprover::select('approver_nik', 'approver_name', 'approver_status')->where('user_nik', $user_nik)->get()->toArray();
+        if($approverList){
+            return response()->json($approverList);
+        }
+        return response()->json("Tidak ada data");
+    }
+    
+    public function updateApproverOrder(Request $request)
+    {
+        $user_nik = Auth::user()->nik;
+        
+        // Mulai transaction untuk memastikan integritas data
+        DB::beginTransaction();
+        try {
+
+            MpdrApprover::where('user_nik', $user_nik)->delete();
+
+            $approver_niks = $request->input('nik');
+            $approver_names = $request->input('name');
+            $approver_statuses = $request->input('status');
+            foreach($approver_niks as $index => $approver_nik){
+                MpdrApprover::create([
+                    'user_nik' => $user_nik,
+                    'approver_nik' => $approver_niks[$index],
+                    'approver_name' => $approver_names[$index],
+                    'approver_status' => $approver_statuses[$index]
+                ]);
+            }
+            DB::commit();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Approver saved successfully!'
+            ]);
+        } catch (\Exception $e) {
+            dd($e);
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollback();
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'There was an error saving approver.'.$e->getMessage()
+            ]);
+        }
     }
 }

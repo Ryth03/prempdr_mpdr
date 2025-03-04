@@ -12,7 +12,6 @@ use App\Models\MPDR\MpdrCertificationRequirement;
 use App\Models\MPDR\MpdrCompetitorProduct;
 use App\Models\MPDR\MpdrDetailedPackaging;
 use App\Models\MPDR\MpdrMarketUpdate;
-use App\Models\MPDR\MpdrApprover;
 use App\Models\MPDR\MpdrApprovedDetail;
 use App\Models\MPDR\MpdrRevision;
 
@@ -73,11 +72,6 @@ class MpdrForm extends Model
     public function market()
     {
         return $this->hasOne(MpdrMarketUpdate::class, 'form_id');
-    }
-    
-    public function approver()
-    {
-        return $this->hasOne(MpdrApprover::class, 'form_id');
     }
 
     public function approvedDetail()

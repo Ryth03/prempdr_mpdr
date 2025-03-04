@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -25,13 +26,13 @@ class UserController extends Controller
     }
 
 
-    public function index()
+    public function indexBefore()
     {
         $departments = Department::all();
         $positions = Position::all();
         $roles = Role::pluck('name', 'name')->all();
         $sections = Section::all();
-        $users = User::with('department.position.section')->get();
+        $users = User::with('department','position','section','roles')->get();
 
         // Dialog Sweet Alert
         $title = 'Delete User!';
@@ -39,6 +40,26 @@ class UserController extends Controller
         confirmDelete($title, $text);
 
         return view('page.master.users.index', ['users' => $users, 'departments' => $departments, 'positions' => $positions, 'roles' => $roles, 'sections' => $sections]);
+    }
+    
+    public function index()
+    {        
+        // Dialog Sweet Alert
+        $title = 'Delete User!';
+        $text = "Are you sure you want to delete?";
+        confirmDelete($title, $text);
+        return view('page.master.users.index');
+    }
+    
+    public function getUsersData()
+    {
+        $departments = Department::all();
+        $positions = Position::all();
+        $roles = Role::select('name')->get()->pluck('name')->toArray();
+        $sections = Section::all();
+        $users = User::with('department','position','section','roles')->get();
+
+        return response()->json(['users' => $users, 'departments' => $departments, 'positions' => $positions, 'roles' => $roles, 'sections' => $sections]);
     }
 
     public function create()
@@ -49,35 +70,40 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        // \dd($request->all());
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
-            'password' => 'required|string|min:8|max:20',
-            'nik' => 'required|string|max:6|unique:users,nik',
-            'roles' => 'required',
-            'position_id' => 'required',
-            'section_id' => 'required',
-            'department_id' => 'required',
-            'status' => 'required'
-        ]);
+        DB::beginTransaction();
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email',
+                'password' => 'required|string|min:8|max:20',
+                'nik' => 'required|string|max:6|unique:users,nik',
+                'roles' => 'required',
+                'position_id' => 'required',
+                'section_id' => 'required',
+                'department_id' => 'required',
+                'status' => 'required'
+            ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'nik' => $request->nik,
-            'department_id' => $request->department_id,
-            'position_id' => $request->position_id,
-            'section_id' => $request->section_id,
-            'password' => Hash::make($request->password),
-            'status' => $request->status
-        ]);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'nik' => $request->nik,
+                'department_id' => $request->department_id,
+                'position_id' => $request->position_id,
+                'section_id' => $request->section_id,
+                'password' => Hash::make($request->password),
+                'status' => $request->status
+            ]);
 
-        $user->syncRoles($request->roles);
+            $user->syncRoles($request->roles);
 
-        Alert::success('Success', 'User created successfully with roles');
-
-        return redirect('/users')->with('status','User created successfully with roles');
+            DB::commit();
+            Alert::success('Success', 'User created successfully');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Alert::error('Error', 'Failed to create user: .'.$e->getMessage());
+        }
+        return redirect()->route('users.index');
     }
 
     public function edit(User $user)
@@ -93,6 +119,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        DB::beginTransaction();
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
@@ -121,13 +148,13 @@ class UserController extends Controller
             $user->update($data);
             $user->syncRoles($request->roles);
 
-            Alert::success('Success', 'User updated successfully with roles');
-
-            return redirect('/users')->with('status','User Updated Successfully with roles');
+            DB::commit();
+            Alert::success('Success', 'User updated successfully!');
         } catch (\Exception $e) {
+            DB::rollback();
             Alert::error('Error', 'Failed to update user: ' . $e->getMessage());
-            return redirect()->back()->withInput();
         }
+        return redirect()->route('users.index');
     }
 
     public function destroy($userId)
@@ -135,7 +162,8 @@ class UserController extends Controller
         $user = User::findOrFail($userId);
         $user->delete();
 
-        return redirect('/users')->with('status','User Delete Successfully');
+        Alert::success('Success', 'User deleted successfully!');
+        return redirect()->route('users.index');
     }
 
     public function updateProfile(Request $request)

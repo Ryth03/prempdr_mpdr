@@ -51,74 +51,74 @@
         <div class="mb-3 d-flex ">
             <div class="me-2">
                 <select class="form-select fw-semibold" id="approver-list">
-                    @php
-                    $names = ["Arief Setiawan", "Maya Sari Dewi", "Rudi Pratama", "Indah Lestari", "Dika Mahendra Putra",
-                        "Siti Nurjanah", "Junaidi Firmansyah", "Liana Anggraini", "Wahyu Prasetya Wijaya", "Rina Anggraeni Sari"];
-                    @endphp
-                    @foreach($names as $name)
-                    <option value="{{$name}}">{{$name}}</option>
-                    @endforeach
+                    <option value="" disabled>Select Approver</option>
                 </select>
             </div>
-            <button class="btn btn-outline-success" onClick="addItem()">
+            <button class="btn btn-outline-success me-2" onClick="addItem()">
                 Add
                 <i class="ti ti-plus"></i>
+            </button>
+            <button id="saveList" class="btn btn-outline-primary ms-auto">
+                Save
+                <i class="ti ti-folder"></i>
             </button>
         </div>
 
         <ul id="sortable"></ul>
     </div>
 
-    @push('scripts')
+@push('scripts')
     <!-- Sortable.js from CDNJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script>
-        function addItem(){
-            var div = document.getElementById('sortable');
-            var selectElement = document.getElementById('approver');
+        function addItem(status){
+            var selectDiv = document.getElementById('sortable');
+            var selectElement = document.getElementById('approver-list');
             var selectedIndex = selectElement.selectedIndex;
             var selectedValue = selectElement.value;
+            var selectedNik = selectElement[selectedIndex].getAttribute('data-nik');
+
             if(selectedValue<1){
                 return;
             }
-
+            
             var randomProfileNumber = Math.floor(Math.random() * 10) + 1;
-            div.innerHTML += `
-                <li class="row bg-primary-subtle sortable-item rounded-2"> 
+            var newItem = `
+                <li data-nik="${selectedNik}" data-name="${selectedValue}" class="row bg-primary-subtle sortable-item rounded-2"> 
                     <div class="col-sm-9 d-flex align-items-center">
                         <img src="http://127.0.0.1:8000/assets/images/profile/user-${randomProfileNumber}.jpg" class="rounded-circle me-2" width="35" height="35" alt="modernize-img">
                         <h6 class="mb-0">${selectedValue}</h6>
                     </div>
                     <div class="col-sm-3">
                         <div class="d-flex align-items-center justify-content-end ms-auto">
-                            <select class="form-select fw-semibold" id="approver">
-                                <option value="active" class="text-success">Active</option>
-                                <option value="vacant" class="text-danger">Vacant</option>
+                            <select class="form-select fw-semibold approver-status ${status == 'Vacant' ? 'text-danger' : 'text-success'}" onChange="changeSelectColor(this)">
+                                <option value="Active" class="text-success" ${status == 'Active' ? 'Selected' : ''}>Active</option>
+                                <option value="Vacant" class="text-danger" ${status == 'Vacant' ? 'Selected' : ''}>Vacant</option>
                             </select>
-                            <button aria-label="Remove Approver" class="btn btn-outline-warning" onClick="deleteItem(this,'${selectedValue}')">
+                            <button aria-label="Remove Approver" class="btn btn-outline-warning" onClick="deleteItem(this, ${selectedIndex})">
                                 <i class="ti ti-trash"></i>
                             </button>
                         </div>
                     </div>
                 </li>
             `;
+
+            $('#sortable').append(newItem);
             
             if (selectedIndex !== -1) {
-                // Menghapus opsi yang dipilih
-                selectElement.remove(selectedIndex);
+                // Menyembunyikan opsi yang dipilih
+                selectElement[selectedIndex].classList.add('d-none');
             }
+            selectElement.selectedIndex = 0;
         }
 
-        function deleteItem(button, name){
-            var selectElement = document.getElementById('approver');
-            var newOption = document.createElement('option');
-            newOption.value = name;  // Nilai yang ingin dimasukkan
-            newOption.textContent = name;  // Teks yang akan ditampilkan
-            selectElement.appendChild(newOption);
+        function deleteItem(button, index){
+            var selectElement = document.getElementById('approver-list');
+            selectElement[index].classList.remove('d-none');
             button.parentNode.parentNode.parentNode.remove();
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        window.addEventListener('load', function () {
             var el = document.getElementById('sortable');
             var sortable = new Sortable(el, {
                 animation: 150,
@@ -128,59 +128,48 @@
                     el.querySelectorAll('.sortable-item').forEach((item, index) => {
                         order.push(item.dataset.id);
                     });
-                    // Kirim data urutan item ke server (misalnya dengan AJAX)
-                    // updateOrder(order);
                 }
             });
-            addItem(); addItem(); addItem();
-        });
-
-        // function updateOrder(order) {
-        //     fetch('/update-order', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        //         },
-        //         body: JSON.stringify({ order: order })
-        //     });
-        // }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mengambil no_reg yang baru
-            fetch('{{ route('prempdr.noReg') }}')
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('no_reg_text').innerHTML = data.no_reg;
-                        document.getElementById('no_reg').value = data.no_reg;
-                    })
-                    .catch(error => {
-                        console.error('Error fetching no_reg:', error);
-                    });
-
-            
-            // mengambil list approver
+            // mengambil list approver yang sudah dibuat
+            var approvers = [];
             $.ajax({
-                url: '{{ route('prempdr.approver.list.data') }}',
+                url: '{{ route('mpdr.selected.approver.list') }}',
                 method: 'GET',
                 success: function(response) {
-                    response.forEach(item => {
-                        $('#initiator').append($('<option>', {
-                            value: item.nik, 
-                            text: item.name  
+                    approvers = response; //menyimpan list approver
+                },
+                error: function() {
+                    // Jika gagal, tampilkan pesan error
+                    console.log('Error ketika mengambil approver yang sudah dibuat.');
+                    // $('#formData').html('<p>There was an error fetching the data.</p>');
+                }
+            });
+            // mengambil list approver
+            $.ajax({
+                url: '{{ route('mpdr.approver.list.data') }}',
+                method: 'GET',
+                success: function(response) {
+                    response.forEach((item, itemIndex) => {
+                        if(approvers.some(approver => approver.approver_nik === item.nik)){ // mencari jika approver ada dengan yang ada di list approver
+                            var approver = approvers.find(approver => approver.approver_nik === item.nik);
+                            approver.order = itemIndex;
+                        }
+                        $('#approver-list').append($('<option>', {
+                            value: item.name,
+                            'data-nik' : item.nik, 
+                            text: item.name
                         }));
-                        $('#salesManager').append($('<option>', {
-                            value: item.nik, 
-                            text: item.name  
-                        }));
-                        $('#marketingManager').append($('<option>', {
-                            value: item.nik,
-                            text: item.name 
-                        }));
-                        $('#deptHead').append($('<option>', {
-                            value: item.nik, 
-                            text: item.name  
-                        }));
+                        
+                    });
+                    
+                    
+                    var selectElement = document.getElementById('approver-list');
+                    approvers.forEach((approver, index) => {
+                        selectElement.selectedIndex = approver.order+1;
+                                    
+                        var selectedIndex = selectElement.selectedIndex;
+                        var selectedValue = selectElement.value;
+                        addItem(approver.approver_status);
                     });
                 },
                 error: function() {
@@ -189,7 +178,72 @@
                     // $('#formData').html('<p>There was an error fetching the data.</p>');
                 }
             });
+
+            
+            
         });
+
+        const saveButton = document.getElementById('saveList');
+        saveButton.addEventListener('click', () => {
+            // Simpan urutan approver saat tombol Save diklik
+            var orderedNik = [];
+            var orderedNames = [];
+            var orderedStatuses = [];
+            $("#sortable li").each(function() {
+                orderedNik.push($(this).data('nik'));
+                orderedNames.push($(this).data('name'));
+                orderedStatuses.push($(this).find('.approver-status').val());
+            });
+            $.ajax({
+                url: '{{ route('mpdr.approver.update.order') }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    nik: orderedNik,
+                    name: orderedNames,
+                    status: orderedStatuses
+                },
+                success: function(response) {
+                    console.log(response);
+                    if(response.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('There was an error saving the order: ', error);
+                    if (response && response.message) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred while processing your request.'
+                        });
+                    }
+                }
+            });
+        });
+
+        
+        function changeSelectColor(select) {
+            var selectedValue = select.value; // Mendapatkan nilai yang dipilih
+            // Menambahkan class sesuai dengan nilai yang dipilih
+            if (selectedValue === 'Active') {
+                select.classList.add('text-success');
+                select.classList.remove('text-danger');
+            } else if (selectedValue === 'Vacant') {
+                select.classList.add('text-danger');
+                select.classList.remove('text-success');
+            }
+        }
     </script>
     @endpush
 
