@@ -450,7 +450,7 @@
                                         <div class="modal-footer">
                                             <div class="d-flex gap-6 m-0">
                                                 <button type="submit" class="btn btn-success">Update</button>
-                                                <button class="btn bg-danger-subtle text-danger" data-bs-dismiss="modal"> Close
+                                                <button type="button" class="btn bg-danger-subtle text-danger" data-bs-dismiss="modal"> Close
                                                 </button>
                                             </div>
                                         </div>

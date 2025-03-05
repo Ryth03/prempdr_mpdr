@@ -57,7 +57,7 @@
                     </div>
                     <div class="col-12 col-md-2">
                         <label for="levelPriority" class="form-label">Level Priority:</label>
-                        <select class="form-select" name="levelPriority" aria-label="Level Priority" required>
+                        <select class="form-select" name="levelPriority" required>
                             <option value="A">A</option>
                             <option value="B">B</option>
                             <option value="C">C</option>
@@ -65,7 +65,9 @@
                     </div>
                     <div class="col-12 col-md-5">
                         <label for="initiator" class="form-label">Initiator:</label>
-                        <input type="text" class="form-control" name="initiator" required> 
+                        <select id="initiator" name="initiator" class="form-select" required>
+                            <option selected disabled value="">Select</option>
+                        </select>
                     </div>
                 </div>
                 <div id="rational">
@@ -334,7 +336,24 @@
                     .catch(error => {
                         console.error('Error fetching no_reg:', error);
                     });
-
+            // mengambil list approver
+            $.ajax({
+                url: '{{ route('mpdr.initiator.list.data') }}',
+                method: 'GET',
+                success: function(response) {
+                    response.forEach(item => {
+                        $('#initiator').append($('<option>', {
+                            value: item.nik, 
+                            text: item.name  
+                        }));
+                    });
+                },
+                error: function() {
+                    // Jika gagal, tampilkan pesan error
+                    console.log('Error ketika mengambil approver list');
+                    // $('#formData').html('<p>There was an error fetching the data.</p>');
+                }
+            });
         });
     </script>
 @endpush

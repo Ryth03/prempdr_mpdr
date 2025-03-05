@@ -50,8 +50,8 @@
         </div>
     </div>
 
-    <div id="prempdr-form" class="border border-4 border-black w-100 mb-4">
-        <header id="prempdr-header" class="row">
+    <div id="mpdr-form" class="border border-4 border-black w-100 mb-4">
+        <header id="mpdr-header" class="row">
             <div class="col-3">
                 <img src="{{ asset('assets') }}/images/logos/logoputih.png" class="dark-logo img-fluid p-0" alt="Logo-Dark">
                 <img src="{{ asset('assets') }}/images/logos/logohitam.png" class="light-logo img-fluid p-0" alt="Logo-light">
@@ -66,24 +66,24 @@
                     <p class="my-auto">Date : <span id="revision-date"></span></p>
             </div>
         </header>
-        <main id="prempdr-main" class="d-flex flex-column gap-3 border-top border-4 border-black p-2">
-            <div class="row">  
-                <div class="col-6">
+        <main id="mpdr-main" class="d-flex flex-column gap-3 border-top border-4 border-black p-2">
+            <div class="d-flex justify-content-end">
+                <label for="projectName" class="form-label">No Reg: <span id="no_reg_text"></span></label>
+                <input type="hidden" id="no_reg" name="no_reg" value="" readonly>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-5">
                     <label for="productName" class="form-label">Product Name:</label>
-                    <input type="text" class="form-control" name="productName" id="productName"> 
+                    <input type="text" class="form-control" id="productName" name="productName" required> 
                 </div>
-                <div class="col-2">
+                <div class="col-12 col-md-2">
                     <label for="levelPriority" class="form-label">Level Priority:</label>
-                    <input type="text" class="form-control" name="levelPriority" id="levelPriority"> 
+                    <input type="text" class="form-control" id="levelPriority" name="levelPriority" required> 
                 </div>
-                <div class="col-4 d-flex justify-content-end">
-                    <label for="no_reg" class="form-label">No Reg: <span id="no_reg_text">25PREMPDR0000</span></label>
-                    <input type="hidden" id="no_reg" name="no_reg" value="" readonly>
+                <div class="col-12 col-md-5">
+                    <label for="initiator" class="form-label">Initiator:</label>
+                    <input type="text" class="form-control" id="initiator" name="initiator" required>
                 </div>
-            </div>  
-            <div class="">
-                <label for="initiator" class="form-label">Proposed BRAND Name:</label>
-                <input type="text" class="form-control" name="initiator" id="initiator"> 
             </div>
             <div id="rational">
                 <label class="form-label">Rational For Development: </label>
@@ -303,7 +303,7 @@
                 <input type="text" class="form-control" name="targetLaunchText"  id="targetLaunch">
             </div>
         </main>
-        <footer id="prempdr-footer" class="p-2 mb-1" style="border-top: 3px solid black ;">
+        <footer id="mpdr-footer" class="p-2 mb-1" style="border-top: 3px solid black ;">
             <table id="approver" class="table table-striped nowrap">
                 <thead>
                     <tr>
@@ -315,34 +315,6 @@
                     </tr>
                 </thead>
                 <tbody class="">
-                    <tr id="initiator">
-                        <td>Initiator</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr id="salesManager">
-                        <td>Dept. Head</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr id="marketingManager">
-                        <td>Ass. Product Manager / Marketing Manager</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr id="deptHead">
-                        <td>Dept. Head</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
                 </tbody>
             </table>
         </footer>
@@ -355,11 +327,21 @@
     <script src="https://cdn.datatables.net/2.2.1/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.0/js/dataTables.responsive.js"></script>
     <script>
+        var approverTable = $('#approver').DataTable({
+            responsive: true,
+            ordering: false,
+            paging: false, 
+            searching: false,
+            info: false ,
+            columnDefs: [
+                { targets: [1,2,3,4], className: 'text-center' }, 
+            ]
+        });
         // Ketika html sudah dimuat
         document.addEventListener('DOMContentLoaded', function() {
             function makeAllReadonly() {
                 // Menjadikan semua elemen input dan textarea readonly
-                var inputs = document.querySelectorAll('input, textarea');  // Pilih semua input
+                var inputs = document.querySelectorAll('#mpdr-form input, #mpdr-form textarea');  // Pilih semua input
                 inputs.forEach(function(input) {
                     if (input.type === 'radio') {
                         if (!input.checked) {
@@ -383,7 +365,6 @@
                     no_reg: no_reg
                 },
                 success: function(response) {
-                    // console.log("berhasil mengambil data", response);
                     // No_Reg
                     $('#no_reg_text').text(no_reg);
                     
@@ -431,7 +412,39 @@
                     $('#potentialVolume').val(response.market.potential_volume);
                     $('#expectedMargin').val(response.market.expected_margin);
                     $('#priceEstimate').val(response.market.price_estimate);
-                                        
+                               
+                    
+                    response.approved_detail.forEach(function(detail, index) {
+                        // Memasukan data ke table approver
+                        var approvedCell = '';
+                        var approvedWithReviewCell  = '';
+                        var notApprovedCell = '';
+                        var commentsCell = '';
+                        if (detail.status !== 'pending' && detail.status !== 'vacant'){
+                            var newDiv = `
+                                <div class="d-flex flex-column">
+                                    <div>${detail.status}</div>
+                                    <div>${detail.approved_date}</div>
+                                </div>
+                            `;
+                            if(detail.status === 'approve'){
+                                approvedCell = newDiv;
+                            }else if(detail.status === 'approve with review'){
+                                approvedWithReviewCell = newDiv;
+                                commentsCell = detail.comments;
+                            }else{
+                                notApprovedCell = newDiv;
+                                commentsCell = detail.comments;
+                            }
+                        }
+                        approverTable.row.add([
+                            detail.approver_name,
+                            approvedCell ? approvedCell : '',
+                            approvedWithReviewCell ? approvedWithReviewCell : '',
+                            notApprovedCell ? notApprovedCell : '',
+                            commentsCell ? commentsCell : ''
+                        ]).draw();
+                    });
                 },
                 error: function() {
                     // Jika gagal, tampilkan pesan error

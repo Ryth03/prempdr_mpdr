@@ -122,8 +122,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/approver', [MpdrController::class, 'approver'])->name('mpdr.approver');
         Route::get('/form', [MpdrController::class, 'viewForm'])->name('mpdr.form.view');
         Route::get('/print', [MpdrController::class, 'print'])->name('mpdr.print');
-        Route::get('/form-approval', [MpdrController::class, 'viewFormApproval'])->name('mpdr.approval.form.view');
-        Route::get('/form-{no_reg}', [MpdrController::class, 'show'])->name('mpdr.form');
 
         Route::get('/no_reg', [MpdrController::class, 'noReg'])->name('mpdr.noReg');
 
@@ -131,9 +129,15 @@ Route::middleware('auth')->group(function () {
         Route::POST('/updateApproverOrder', [MpdrController::class, 'updateApproverOrder'])->name('mpdr.approver.update.order');
         Route::get('/getSelectedApproverList', [MpdrController::class, 'getSelectedApproverList'])->name('mpdr.selected.approver.list');
         Route::get('/getApproverListData', [MpdrController::class, 'getApproverListData'])->name('mpdr.approver.list.data');
+        Route::get('/getApprovalListData', [MpdrController::class, 'getApprovalListData'])->name('mpdr.approval.list.data');
+        Route::get('/getInitiatorList', [MpdrController::class, 'getInitiatorList'])->name('mpdr.initiator.list.data');
         Route::get('/getFormList', [MpdrController::class, 'getFormList'])->name('mpdr.form.list');
         Route::get('/getFormData', [MpdrController::class, 'getFormData'])->name('mpdr.form.data');
 
+        
+        Route::POST('/form-approve-{no_reg}', [MpdrController::class, 'approveForm'])->name('mpdr.form.approve');
+        Route::get('/form-approval-{no_reg}', [MpdrController::class, 'viewApprovalForm'])->name('mpdr.approval.form.view');
+        Route::get('/form-{no_reg}', [MpdrController::class, 'show'])->name('mpdr.form');
     });
 
 

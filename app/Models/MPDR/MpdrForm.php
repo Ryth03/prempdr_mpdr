@@ -14,6 +14,7 @@ use App\Models\MPDR\MpdrDetailedPackaging;
 use App\Models\MPDR\MpdrMarketUpdate;
 use App\Models\MPDR\MpdrApprovedDetail;
 use App\Models\MPDR\MpdrRevision;
+use App\Models\MPDR\MpdrInitiatorApprovedDetail;
 
 class MpdrForm extends Model
 {
@@ -32,6 +33,11 @@ class MpdrForm extends Model
     public function revision()
     {
         return $this->belongsTo(MpdrRevision::class);
+    }
+    
+    public function initiator()
+    {
+        return $this->hasOne(MpdrInitiatorApprovedDetail::class, 'form_id');
     }
 
     public function detail()

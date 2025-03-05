@@ -6,15 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\MPDR\MpdrForm;
 
-class MpdrApprovedDetail extends Model
+class MpdrInitiatorApprovedDetail extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'form_id',
-        'approver_nik',
-        'approver_name',
-        'level',
+        'initiator_nik',
+        'initiator_name',
         'status',
         'comment',
         'token',

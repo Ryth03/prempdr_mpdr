@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Mpdr;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -83,7 +84,7 @@ class MpdrController extends Controller
                 'user_id' => Auth::user()->id,
                 'revision_id' => $revision->id,
                 'product_name' => $validated['productName'],
-                'initiator' => $validated['initiator'],
+                'initiator' => User::where('nik', $validated['initiator'])->first()->name,
                 'level_priority' => $validated['levelPriority'],
                 'status' => 'In Approval'
             ]);
@@ -147,6 +148,26 @@ class MpdrController extends Controller
                 'expected_margin' => $validated['expectedMargin'],
                 'price_estimate' => $validated['priceEstimate']
             ]);
+
+            $form->initiator()->create([
+                'form_id' => $form->id,
+                'initiator_nik' => $validated['initiator'],
+                'initiator_name' => User::where('nik', $validated['initiator'])->first()->name,
+                'status' => 'pending',
+                'token' => Str::uuid()
+            ]);
+
+            $approvers = MpdrApprover::where('user_nik', Auth::user()->nik)->get();
+            foreach($approvers as $index => $approver){
+
+                $form->approvedDetail()->create([
+                    'form_id' => $form->id,
+                    'approver_nik' => $approver->approver_nik,
+                    'approver_name' => $approver->approver_name,
+                    'status' => $approver->approver_status == 'Active' ? 'Active' : 'Vacant',
+                    'token' => Str::uuid()
+                ]);
+            }
 
             // Commit transaksi
             DB::commit();
@@ -272,7 +293,7 @@ class MpdrController extends Controller
 
     public function getFormData(Request $request)
     {
-        $form = MpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market')->where('no', $request->input('no_reg'))->first();
+        $form = MpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approvedDetail')->where('no', $request->input('no_reg'))->first();
         if($form){
             return response()->json($form);
         }
@@ -292,8 +313,8 @@ class MpdrController extends Controller
     
     public function getSelectedApproverList()
     {
-            $user_nik = Auth::user()->nik;
-            $approverList = MpdrApprover::select('approver_nik', 'approver_name', 'approver_status')->where('user_nik', $user_nik)->get()->toArray();
+        $user_nik = Auth::user()->nik;
+        $approverList = MpdrApprover::select('approver_nik', 'approver_name', 'approver_status')->where('user_nik', $user_nik)->get()->toArray();
         if($approverList){
             return response()->json($approverList);
         }
@@ -336,5 +357,50 @@ class MpdrController extends Controller
                 'message' => 'There was an error saving approver.'.$e->getMessage()
             ]);
         }
+    }
+
+    public function getInitiatorList(){
+        $initiatorList = User::where('status', 'Active')->get(); //role('approver')->
+        if($initiatorList){
+            return response()->json($initiatorList);
+        }
+        return response()->json("Tidak ada data");
+    }
+
+    public function getApprovalListData()
+    {
+        $userLogin = Auth::user();
+        $nik = $userLogin->nik;
+        $forms = null;
+        /** @var User $userLogin */
+        if(!$userLogin->hasRole('approver')){
+            $forms = MpdrForm::where('status', 'In Approval')
+            ->whereHas('initiator', function ($query) use($nik){
+                $query->where('initiator_nik', $nik)->where('status', 'pending');
+            })
+            ->get();
+        }else{
+            $forms = MpdrForm::where('status', 'In Approval')
+            ->whereHas('initiator', function ($query) use($nik){
+                $query->where('status', 'approve');
+            })
+            ->whereHas('approvedDetail', function ($query) use($nik){
+                $query->where('approver_nik', $nik)->where('status', 'pending');
+            })
+            ->get();
+        }
+        
+        if($forms){
+            return response()->json($forms);
+        }
+
+        return response()->json("Tidak ada Form");
+    }
+
+    
+    public function viewApprovalForm($no_reg)
+    {
+        confirmDelete();
+        return view('page.mpdr.form-approval-mpdr')->with('no_reg', $no_reg);
     }
 }

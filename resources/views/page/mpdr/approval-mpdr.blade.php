@@ -4,6 +4,8 @@
     @endsection
 
     @push('css')
+        <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.0/css/responsive.bootstrap.min.css">
     @endpush
 
 
@@ -44,19 +46,39 @@
                     <th>Action</th>
                 </thead>
                 <tbody>
-                    <!-- start row -->
-                    @for($i=1; $i < 3; $i++)
-                        <tr>
-                            <td>{{$i}}</td>
-                            <td>Form {{$i}}</td>
-                            <td>
-                                <a href="{{route('mpdr.approval.form.view')}}" class="btn btn-outline-primary" >Go To Approval Form</a>
-                            </td>
-                        </tr>
-                    @endfor
                 </tbody>
             </table>
            </div>
         </div>
     </div>
+@push('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.0/js/dataTables.responsive.js"></script>
+    <script>
+        $('#mpdrTable').DataTable({
+            processing: true,
+            serverSide: false,
+            ajax: {
+                url: '{{ route('mpdr.approval.list.data') }}',
+                type: 'GET',
+                dataSrc: function(response) {
+                    console.log(response);
+                    return response;
+                }
+            },
+            columns: [
+                { data: 'no', name: 'no_reg' },
+                { data: 'product_name', name: 'name' },
+                { data: null, name: 'action', orderable: false, searchable: false, 
+                    render: function(data, type, row) {
+                        const route = "{{ route('mpdr.approval.form.view', ':formId') }}";
+                        const url = route.replace(':formId', row.no);
+                        return `<a href="${url}" class="btn btn-outline-primary" >Go To Approval Form</a>`;
+                    }
+                }
+            ]
+        });
+    </script>
+@endpush
 </x-app-layout>

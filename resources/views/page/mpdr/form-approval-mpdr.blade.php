@@ -48,8 +48,8 @@
         </div>
     </div>
 
-    <div id="content" class="border border-4 border-black w-100">
-        <header class="row">
+    <div id="mpdr-form" class="border border-4 border-black w-100">
+        <header id="mpdr-header" class="row">
             <div class="col-3">
                 <img src="{{ asset('assets') }}/images/logos/logoputih.png" class="dark-logo img-fluid p-0" alt="Logo-Dark">
                 <img src="{{ asset('assets') }}/images/logos/logohitam.png" class="light-logo img-fluid p-0" alt="Logo-light">
@@ -58,146 +58,140 @@
                 <h4>MARKETING</h4>
                 <h4>PRODUCT DEVELOPMENT REQUEST</h4>
             </div>
-            <div class="col-3 d-flex flex-column justify-content-between">
-                    <p>No : F/S.1.4-01</p>
-                    <p>Revision : 1</p>
-                    <p>Date : 29 September 2015</p>
+            <div class="col-3 d-flex flex-column justify-content-around">
+                    <p class="my-auto">No : <span id="revision-no"></span></p>
+                    <p class="my-auto">Revision : <span id="revision-count"></span></p>
+                    <p class="my-auto">Date : <span id="revision-date"></span></p>
             </div>
         </header>
-
-        <main class="d-flex flex-column gap-3 border-top border-4 border-black p-2">
-            <div class="">
-                <label for="productName" class="form-label">Product Name (complete):</label>
-                <input type="text" class="form-control" name="productName"> 
+        <main id="mpdr-main" class="d-flex flex-column gap-3 border-top border-4 border-black p-2">
+            <div class="d-flex justify-content-end">
+                <label for="projectName" class="form-label">No Reg: <span id="no_reg_text"></span></label>
+                <input type="hidden" id="no_reg" name="no_reg" value="" readonly>
             </div>
-            <div class="">
-                <label for="levelPriority" class="form-label">Level Priority:</label>
-                <input type="text" class="form-control" name="levelPriority"> 
-            </div>
-            <div class="">
-                <label for="initiator" class="form-label">Initiator:</label>
-                <input type="text" class="form-control" name="initiator"> 
-            </div>
-            <div id="type" class="" >
-                <label class="form-label">Type of Request: </label>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="typeOfRequest" id="typeOfRequest1" checked>
-                    <label class="form-check-label" for="typeOfRequest1">
-                    NEW PRODUCT
-                    </label>
+            <div class="row">
+                <div class="col-12 col-md-5">
+                    <label for="productName" class="form-label">Product Name:</label>
+                    <input type="text" class="form-control" id="productName" name="productName" required> 
                 </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="typeOfRequest" id="typeOfRequest2">
-                    <label class="form-check-label" for="typeOfRequest2">
-                    EXISTING PRODUCT
-                    </label>
+                <div class="col-12 col-md-2">
+                    <label for="levelPriority" class="form-label">Level Priority:</label>
+                    <input type="text" class="form-control" id="levelPriority" name="levelPriority" required> 
+                </div>
+                <div class="col-12 col-md-5">
+                    <label for="initiator" class="form-label">Initiator:</label>
+                    <input type="text" class="form-control" id="initiator" name="initiator" required>
                 </div>
             </div>
             <div id="rational">
                 <label class="form-label">Rational For Development: </label>
-                <div class="text-decoration-underline link-offset-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur eum maiores officiis quo voluptatem deleniti beatae modi optio consequuntur, voluptatum ratione dolore esse neque adipisci reiciendis sed, ipsum distinctio delectus!</div>
+                <textarea class="form-control no-resize" name="rationalForDevelopment" id="rationalForDevelopment" rows="2" required></textarea>
             </div>
-            <div id="productCategory">
-                <label class="form-label">Product Category:</label>
-                <div class="">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="productCategory" id="productCategory1" checked>
-                        <label class="form-check-label" for="productCategory1">
-                        Margarine
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="productCategory" id="productCategory2">
-                        <label class="form-check-label" for="productCategory2">
-                        Frying Fats
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="productCategory" id="productCategory3">
-                        <label class="form-check-label" for="productCategory3">
-                        Shortening
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="productCategory" id="productCategory4">
-                        <label class="form-check-label" for="productCategory4">
-                        Pastry
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="productCategory" id="productCategory5">
-                        <label class="form-check-label" for="productCategory5">
-                            Others
-                        </label>
-                        <input type="text" class="form-control" name="productCategoryText" placeholder="(Others)">
+            <div class="row">
+                <div id="productCategory" class="col">
+                    <label class="form-label">Product Category:</label>
+                    <div class="">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="productCategory" id="Margarine">
+                            <label class="form-check-label" for="Margarine">
+                            Margarine
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="productCategory" id="Frying Fats">
+                            <label class="form-check-label" for="Frying Fats">
+                            Frying Fats
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="productCategory" id="Shortening">
+                            <label class="form-check-label" for="Shortening">
+                            Shortening
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="productCategory" id="Pastry">
+                            <label class="form-check-label" for="Pastry">
+                            Pastry
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="productCategory" id="Others">
+                            <label class="form-check-label" for="Others">
+                                Others
+                            </label>
+                            <input type="text" class="form-control" name="productCategoryText" id="productCategoryText">
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div id="channel">
-                <label class="form-label">Channel Destination:</label>
-                <div class="">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="channel" id="channel1" checked>
-                        <label class="form-check-label" for="channel1">
-                        International
-                        </label>
-                        <input type="text" class="form-control" name="country" placeholder="Country">
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="channel" id="channel2">
-                        <label class="form-check-label" for="channel2">
-                        Regional
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="channel" id="channel3">
-                        <label class="form-check-label" for="channel3">
-                        Industrial
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="channel" id="channel4">
-                        <label class="form-check-label" for="channel4">
-                        FSBC-Direct
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="channel" id="channel5">
-                        <label class="form-check-label" for="channel5">
-                        FSBC-Distributor
-                        </label>
+                <div id="channel" class="col">
+                    <label class="form-label">Channel:</label>
+                    <div class="">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="channel" id="International">
+                            <label class="form-check-label" for="International">
+                            International
+                            </label>
+                            <input type="text" class="form-control" name="country" id="country">
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="channel" id="Regional">
+                            <label class="form-check-label" for="Regional">
+                            Regional
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="channel" id="Industrial">
+                            <label class="form-check-label" for="Industrial">
+                            Industrial
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="channel" id="FSBC-Direct">
+                            <label class="form-check-label" for="FSBC-Direct">
+                            FSBC-Direct
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="channel" id="FSBC-Distributor">
+                            <label class="form-check-label" for="FSBC-Distributor">
+                            FSBC-Distributor
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
             <h5>GENERAL PRODUCT DESCRIPTION AND FUNCTION</h5>
-            <div id="productDescription">
-                <label class="form-label">Product Description <span class="fw-normal">(Form/Color/Flavor/Packaging brief brief)</span>: </label>
-                <div class="text-decoration-underline link-offset-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur eum maiores officiis quo voluptatem deleniti beatae modi optio consequuntur, voluptatum ratione dolore esse neque adipisci reiciendis sed, ipsum distinctio delectus!</div>
-            </div>
-            <div class="">
-                <label for="storageTemperature" class="form-label">Storage Temperature:</label>
-                <input type="text" class="form-control ms-2" name="storageTemperature"> 
-            </div>
-            <div class="">
-                <label for="deliveryTemperature" class="form-label">Delivery Temperature:</label>
-                <input type="text" class="form-control ms-2" name="deliveryTemperature"> 
+            <div id="productDescriptionDiv">
+                <label class="form-label">Product Description <span class="fw-normal">(Form/Color/Flavor brief)</span>: </label>
+                <div id="productDescription"></div>
             </div>
             <div id="usage">
                 <label class="form-label">Usage Description <span class="fw-normal">(Application in customer)</span>: </label>
-                <div class="text-decoration-underline link-offset-3">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequatur eum maiores officiis quo voluptatem deleniti beatae modi optio consequuntur, voluptatum ratione dolore esse neque adipisci reiciendis sed, ipsum distinctio delectus!</div>
+                <input type="text" class="form-control" id="usageDescription">
+            </div>
+            <div class="row">
+                <div class="col" id="storage">
+                    <label class="form-label">Storage Temperature: </label>
+                    <input type="text" class="form-control" name="storageTemperature" id="storageTemperature">
+                </div>
+                <div class="col" id="delivery">
+                    <label class="form-label">Delivery Temperature: </label>
+                    <input type="text" class="form-control" name="deliveryTemperature" id="deliveryTemperature">
+                </div>
             </div>
             <div id="certification">
                 <label class="form-label">Certification Requirement:</label>
                 <div class="">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="certification" id="certification1"  checked>
-                        <label class="form-check-label" for="certification1">
+                        <input class="form-check-input" type="radio" name="certification" id="BPOM">
+                        <label class="form-check-label" for="BPOM">
                         BPOM
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="certification" id="certification2">
-                        <label class="form-check-label" for="certification2">
+                        <input class="form-check-input" type="radio" name="certification" id="HALAL">
+                        <label class="form-check-label" for="HALAL">
                         HALAL
                         </label>
                     </div>
@@ -206,7 +200,7 @@
                         <label class="form-check-label" for="certification3">
                             Others
                         </label>
-                        <input type="text" class="form-control" name="certificationText" placeholder="(Others)">
+                        <input type="text" class="form-control" id="certificationText" name="certificationText">
                     </div>
                 </div>
             </div>
@@ -225,17 +219,17 @@
                     <tbody>
                         <tr>
                             <td>1</td>
-                            <td><input type="text" class="form-control" name="productName1" id="" placeholder="Product Name"></td>
-                            <td><input type="text" class="form-control" name="size1" id=""></td>
-                            <td><input type="text" class="form-control" name="packaging1" id=""></td>
-                            <td><input type="text" class="form-control" name="priceIndication1" id=""></td>
+                            <td><input type="text" class="form-control" name="productName1" id="productName1"></td>
+                            <td><input type="text" class="form-control" name="size1" id="size1"></td>
+                            <td><input type="text" class="form-control" name="packaging1" id="packaging1"></td>
+                            <td><input type="text" class="form-control" name="priceIndication1" id="priceIndication1"></td>
                         </tr>
                         <tr>
                             <td>2</td>
-                            <td><input type="text" class="form-control" name="productName2" id="" placeholder="Product Name"></td>
-                            <td><input type="text" class="form-control" name="size2" id="" ></td>
-                            <td><input type="text" class="form-control" name="packaging2" id=""></td>
-                            <td><input type="text" class="form-control" name="priceIndication2" id=""></td>
+                            <td><input type="text" class="form-control" name="productName2" id="productName2"></td>
+                            <td><input type="text" class="form-control" name="size2" id="size2" ></td>
+                            <td><input type="text" class="form-control" name="packaging2" id="packaging2"></td>
+                            <td><input type="text" class="form-control" name="priceIndication2" id="priceIndication2"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -246,31 +240,33 @@
                     <li>
                         <div class="">
                             <label for="weightProduct" class="form-label">Weight of Product (kg/carton):</label>
-                            <input type="text" class="form-control" name="weightProduct"> 
+                            <input type="text" class="form-control" name="weightProduct" id="weightProduct"> 
                         </div>
                     </li>
                     <li>
-                        <label class="form-label">Inner Packaging:</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="packaging" id="existingPackaging" checked>
-                            <label class="form-check-label" for="existing">
-                            Existing
-                            </label>
-                            <input type="text" class="form-control" name="existingPackagingText" placeholder="Details">
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="packaging" id="newPackaging">
-                            <label class="form-check-label" for="newPackaging">
-                            New
-                            </label>
-                            <input type="text" class="form-control" name="newPackagingText" placeholder="Details">
+                        <label class="form-label">Packaging:</label>
+                        <div class="row">
+                            <div class="col form-check">
+                                <input class="form-check-input" type="radio" name="packaging" id="ExistingPackaging">
+                                <label class="form-check-label" for="ExistingPackaging">
+                                Existing
+                                </label>
+                                <textarea class="form-control no-resize" name="ExistingPackagingText" id="ExistingPackagingText" rows="2"></textarea>
+                            </div>
+                            <div class="col form-check">
+                                <input class="form-check-input" type="radio" name="packaging" id="NewPackaging">
+                                <label class="form-check-label" for="NewPackaging">
+                                New
+                                </label>
+                                <textarea class="form-control no-resize" name="NewPackagingText" id="NewPackagingText" rows="2"></textarea>
+                            </div>
                         </div>
                     </li>
                     <li>
                         <div>
                             <label class="form-label">Product Variation List:</label>
                             <div>
-                                <input type="text" class="form-control" name="productVariation" id="">
+                                <input type="text" class="form-control" name="productVariation" id="productVariation">
                             </div>
                         </div>
                     </li>
@@ -282,25 +278,27 @@
                     <li>
                         <div class="form-chcek">
                             <label for="potentialVolume" class="form-label">Potential Volume (Mt/Annually):</label>
-                            <input type="text" class="form-control" name="potentialVolume"> 
+                            <input type="text" class="form-control" name="potentialVolume" id="potentialVolume"> 
                         </div>
                     </li>
                     <li>
                         <label class="form-label">Pricing Strategy</label>
-                        <div class="form-check">
-                            <label for="expectedMargin" class="form-label">Expected Margin (%):</label>
-                            <input type="text" class="form-control" name="expectedMargin">
-                        </div>
-                        <div class="form-check">
-                            <label for="priceEstimate" class="form-label">Price Estimate:</label>
-                            <input type="text" class="form-control" name="priceEstimate">
+                        <div class="row">
+                            <div class="col form-check">
+                                <label for="expectedMargin" class="form-label">Expected Margin (%):</label>
+                                <input type="text" class="form-control" name="expectedMargin" id="expectedMargin">
+                            </div>
+                            <div class="col form-check">
+                                <label for="priceEstimate" class="form-label">Price Estimate:</label>
+                                <input type="text" class="form-control" name="priceEstimate" id="priceEstimate">
+                            </div>
                         </div>
                     </li>
                 </ol>
             </div>
             <div class="">
-                <h5>TARGET LAUNCH: </h5>
-                <input type="text" class="form-control" name="targetLaunchText"  placeholder="End wk of January - ETD Shipment (for first trial 1 FCL-2 FCL)">
+                <h5>TARGET LAUNCH (as Initiator request): </h5>
+                <input type="text" class="form-control" name="targetLaunchText"  id="targetLaunch">
             </div>
         </main>
 
@@ -316,116 +314,32 @@
                     </tr>
                 </thead>
                 <tbody class="">
-                    <tr>
-                        <td>Ass. Product Manager</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>Marketing Manager</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>S&amp;M Dept. Head</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>R&amp;D Manager</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>QMHSE Dept. Head</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>Halal Coordinator</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>Mfg Dept. Head</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>Purchasing Manager</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>PPIC Manager</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>SCM Dept. Head</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>F &amp; A Dept. Head</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    <tr>
-                        <td>General Manager [as Mfg Dept. Head]</td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                        <td class="text-center"></td>
-                    </tr>
                 </tbody>
             </table>
         </footer>
+    </div>
 
-        <form id="form" method="POST" class="w-full">
-            <div id="aprove/reject" class="d-flex flex-column align-items-center">
-                <input type="hidden" name="formId" value="">
-                <textarea name="comment" id="comment" class="m-2 form-control rounded-lg w-100 border border-3" style="max-width:450px; resize: none;" rows="5" placeholder="Tulis komentar disini..."></textarea>
-                <div id="textarea-warning" class="d-none fw-bold text-danger">Tolong isi kolom komentar.</div>
-                <div class="w-full flex" style="justify-content: space-evenly;">
-                    <div class="flex sm:!flex-row flex-col mt-2">
-                        <input type="hidden" name="action" id="action" value="">
-                        <button type="button" name="action" value="approve" class="m-2 px-4 py-2 btn btn-outline-success" onclick="submitForm('approve')">
-                            Approve
-                        </button>
-                        <button type="button" name="action" value="approve" class="m-2 px-4 py-2 btn btn-outline-warning" onclick="validateForm('approve')">
-                            Approve with Review
-                        </button>
-                        <button type="button" name="action" value="reject" class="m-2 px-4 py-2 btn btn-outline-danger" onclick="validateForm('reject')">
-                            Not Approved
-                        </button>
-                    </div>
+    <form id="form" method="POST" class="w-full">
+        <div id="aprove/reject" class="d-flex flex-column align-items-center">
+            <input type="hidden" name="formId" value="">
+            <textarea name="comment" id="comment" class="m-2 form-control rounded-lg w-100 border border-3" style="max-width:450px; resize: none;" rows="5" placeholder="Tulis komentar disini..."></textarea>
+            <div id="textarea-warning" class="d-none fw-bold text-danger">Tolong isi kolom komentar.</div>
+            <div class="w-full flex" style="justify-content: space-evenly;">
+                <div class="flex sm:!flex-row flex-col mt-2">
+                    <input type="hidden" name="action" id="action" value="">
+                    <button type="button" name="action" value="approve" class="m-2 px-4 py-2 btn btn-outline-success" onclick="submitForm('approve')">
+                        Approve
+                    </button>
+                    <button type="button" name="action" value="approve" class="m-2 px-4 py-2 btn btn-outline-warning" onclick="validateForm('approve')">
+                        Approve with Review
+                    </button>
+                    <button type="button" name="action" value="reject" class="m-2 px-4 py-2 btn btn-outline-danger" onclick="validateForm('reject')">
+                        Not Approved
+                    </button>
                 </div>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -441,12 +355,15 @@
             info: false 
         });
         
-        var table = $('#approver').DataTable({
+        var approverTable = $('#approver').DataTable({
             responsive: true,
             ordering: false,
             paging: false, 
             searching: false,
-            info: false 
+            info: false ,
+            columnDefs: [
+                { targets: [1,2,3,4], className: 'text-center' }, 
+            ]
         });
 
         function submitForm(value) {
@@ -480,23 +397,121 @@
             }
         }
 
-        function makeAllReadonly() {
-            // Menjadikan semua elemen input dan textarea readonly
-            var inputs = document.querySelectorAll('input');  // Pilih semua input
-            console.log('test', inputs);
-            inputs.forEach(function(input) {
-                if (input.type === 'radio') {
-                    if (!input.checked) {
-                        console.log('Menonaktifkan radio button:', input);
-                        input.disabled = true;  // Menonaktifkan radio button jika belum disabled
+        document.addEventListener('DOMContentLoaded', function() {
+            function makeAllReadonly() {
+                // Menjadikan semua elemen input dan textarea readonly
+                var inputs = document.querySelectorAll('#mpdr-form input, #mpdr-form textarea');  // Pilih semua input
+                inputs.forEach(function(input) {
+                    if (input.type === 'radio') {
+                        if (!input.checked) {
+                            input.disabled = true;  // Menonaktifkan radio button jika belum disabled
+                        }
+                    } else {
+                        input.readOnly = true; // Setiap input dan textarea menjadi readonly
                     }
-                } else {
-                    input.readOnly = true; // Setiap input dan textarea menjadi readonly
+                
+                });
+            }
+            makeAllReadonly();
+
+            const no_reg = @json($no_reg);
+
+            // fetch data form
+            $.ajax({
+                url: '{{ route('mpdr.form.data') }}', // URL ke controller
+                method: 'GET',
+                data: {
+                    no_reg: no_reg
+                },
+                success: function(response) {
+                    // No_Reg
+                    $('#no_reg_text').text(no_reg);
+                    
+                    // Revision
+                    $('#revision-no').text(response.revision.no);
+                    $('#revision-count').text(response.revision.revision);
+                    $('#revision-date').text(response.revision.date);
+                    
+                    $('#productName').val(response.product_name);
+                    $('#levelPriority').val(response.level_priority);
+                    $('#initiator').val(response.initiator);
+
+                    $('#rationalForDevelopment').text(response.detail.rational_for_development);
+                    $('#targetLaunch').val(response.detail.target_launch);
+
+                    $(`#${response.category.category}`).attr('checked', true).attr('disabled', false);
+                    $('#productCategoryText').val(response.category.other);
+
+                    $(`#${response.channel.category}`).attr('checked', true).attr('disabled', false);
+                    $('#country').val(response.channel.country);
+
+                    $('#productDescription').html(response.description.product_description);
+                    $('#usageDescription').val(response.description.usage_description);
+                    $('#storageTemperature').val(response.description.storage_temperature);
+                    $('#deliveryTemperature').val(response.description.delivery_temperature);
+                    
+                    $(`#${response.certification.category}`).attr('checked', true).attr('disabled', false);
+                    $('#certificationText').val(response.certification.other);
+
+                    // Competitor's Product
+                    response.competitor.forEach(function(value, index) {
+                        $(`#productName${index+1}`).val(response.competitor[index].name);
+                        $(`#size${index+1}`).val(response.competitor[index].size);
+                        $(`#packaging${index+1}`).val(response.competitor[index].packaging);
+                        $(`#priceIndication${index+1}`).val(response.competitor[index].price);
+                    });
+
+                    // Detailed Packaging
+                    $('#weightProduct').val(response.packaging.weight);
+                    $(`#${response.packaging.category}Packaging`).attr('checked', true).attr('disabled', false);
+                    $(`#${response.packaging.category}PackagingText`).val(response.packaging.detail);
+                    $('#productVariation').val(response.packaging.product_variation);
+
+                    
+                    $('#potentialVolume').val(response.market.potential_volume);
+                    $('#expectedMargin').val(response.market.expected_margin);
+                    $('#priceEstimate').val(response.market.price_estimate);
+                    
+                    response.approved_detail.forEach(function(detail, index) {
+                        // Memasukan data ke table approver
+                        var approvedCell = '';
+                        var approvedWithReviewCell  = '';
+                        var notApprovedCell = '';
+                        var commentsCell = '';
+                        if (detail.status !== 'pending' && detail.status !== 'vacant'){
+                            var newDiv = `
+                                <div class="d-flex flex-column">
+                                    <div>${detail.status}</div>
+                                    <div>${detail.approved_date}</div>
+                                </div>
+                            `;
+                            if(detail.status === 'approve'){
+                                approvedCell = newDiv;
+                            }else if(detail.status === 'approve with review'){
+                                approvedWithReviewCell = newDiv;
+                                commentsCell = detail.comments;
+                            }else{
+                                notApprovedCell = newDiv;
+                                commentsCell = detail.comments;
+                            }
+                        }
+                        approverTable.row.add([
+                            detail.approver_name,
+                            approvedCell ? approvedCell : '',
+                            approvedWithReviewCell ? approvedWithReviewCell : '',
+                            notApprovedCell ? notApprovedCell : '',
+                            commentsCell ? commentsCell : ''
+                        ]).draw();
+                    });
+                },
+                error: function() {
+                    // Jika gagal, tampilkan pesan error
+                    console.log('Error ketika mengambil data form');
+                    // $('#formData').html('<p>There was an error fetching the data.</p>');
                 }
-            
             });
-        }
-        makeAllReadonly();
+
+        });
     </script>
 @endpush
 

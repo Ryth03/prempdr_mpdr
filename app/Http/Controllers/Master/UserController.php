@@ -24,23 +24,6 @@ class UserController extends Controller
         $this->middleware('permission:update user', ['only' => ['update','edit']]);
         $this->middleware('permission:delete user', ['only' => ['destroy']]);
     }
-
-
-    public function indexBefore()
-    {
-        $departments = Department::all();
-        $positions = Position::all();
-        $roles = Role::pluck('name', 'name')->all();
-        $sections = Section::all();
-        $users = User::with('department','position','section','roles')->get();
-
-        // Dialog Sweet Alert
-        $title = 'Delete User!';
-        $text = "Are you sure you want to delete?";
-        confirmDelete($title, $text);
-
-        return view('page.master.users.index', ['users' => $users, 'departments' => $departments, 'positions' => $positions, 'roles' => $roles, 'sections' => $sections]);
-    }
     
     public function index()
     {        

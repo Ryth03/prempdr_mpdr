@@ -4,7 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Models\Idea\Idea;
 use App\Models\Master\Department;
 use App\Models\Master\Position;
 use App\Models\Master\Section;
@@ -69,11 +68,6 @@ class User extends Authenticatable
     public function manager()
     {
         return $this->belongsTo(User::class, 'manager_id');
-    }
-
-    public function idea()
-    {
-        return $this->hasMany(Idea::class);
     }
 
     public function section()

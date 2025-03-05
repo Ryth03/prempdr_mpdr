@@ -58,7 +58,7 @@
                     </div>
                     <div class="col-12 col-md-2">
                         <label for="levelPriority" class="form-label">Level Priority:</label>
-                        <select class="form-select" name="levelPriority" aria-label="Level Priority" required>
+                        <select class="form-select" name="levelPriority" required>
                             <option value="A">A</option>
                             <option value="B">B</option>
                             <option value="C">C</option>
@@ -300,7 +300,7 @@
                         <tr>
                             <td>Initiator</td>
                             <td>
-                                <select id="initiator" name="initiator" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                                <select id="initiator" name="initiator" class="form-select form-select-sm" required>
                                     <option selected disabled value="">Select</option>
                                 </select>
                             </td>
@@ -308,7 +308,7 @@
                         <tr>
                             <td>Sales Manager</td>
                             <td>
-                                <select id="salesManager" name="salesManager" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                                <select id="salesManager" name="salesManager" class="form-select form-select-sm" required>
                                     <option selected disabled value="">Select</option>
                                 </select>
                             </td>
@@ -316,7 +316,7 @@
                         <tr>
                             <td>Marketing Manager</td>
                             <td>
-                                <select id="marketingManager" name="marketingManager" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                                <select id="marketingManager" name="marketingManager" class="form-select form-select-sm" required>
                                     <option selected disabled value="">Select</option>
                                 </select>
                             </td>
@@ -324,7 +324,7 @@
                         <tr>
                             <td>Sales & Marketing Dept. Head</td>
                             <td>
-                                <select id="deptHead" name="deptHead" class="form-select form-select-sm" aria-label=".form-select-sm example" required>
+                                <select id="deptHead" name="deptHead" class="form-select form-select-sm" required>
                                     <option selected disabled value="">Select</option>
                                 </select>
                             </td>

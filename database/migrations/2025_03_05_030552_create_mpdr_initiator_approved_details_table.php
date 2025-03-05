@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mpdr_approved_details', function (Blueprint $table) {
+        Schema::create('mpdr_initiator_approved_details', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('form_id');
-            $table->string('approver_nik');
-            $table->string('approver_name');
+            $table->string('initiator_nik');
+            $table->string('initiator_name');
             $table->string('status')->nullable();
             $table->text('comment')->nullable();
             $table->text('token')->nullable();
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mpdr_approved_details');
+        Schema::dropIfExists('mpdr_initiator_approved_details');
     }
 };

@@ -579,6 +579,7 @@
                             <div>${detail.approved_date}</div>
                         `;
                     }
+                    $(divId).find('td').html('');
                     $(divId).find('td').eq(0).text(detail.name);
                     if(detail.status === 'approve'){
                         $(divId).find('td').eq(1).html(newDiv);  // Kolom kedua
