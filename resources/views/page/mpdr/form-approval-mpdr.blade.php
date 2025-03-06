@@ -319,7 +319,8 @@
         </footer>
     </div>
 
-    <form id="form" method="POST" class="w-full">
+    <form id="form" action="{{ route('mpdr.form.approve', ['no_reg' => $no_reg]) }}" method="POST" class="w-full">
+        @csrf
         <div id="aprove/reject" class="d-flex flex-column align-items-center">
             <input type="hidden" name="formId" value="">
             <textarea name="comment" id="comment" class="m-2 form-control rounded-lg w-100 border border-3" style="max-width:450px; resize: none;" rows="5" placeholder="Tulis komentar disini..."></textarea>
@@ -330,11 +331,11 @@
                     <button type="button" name="action" value="approve" class="m-2 px-4 py-2 btn btn-outline-success" onclick="submitForm('approve')">
                         Approve
                     </button>
-                    <button type="button" name="action" value="approve" class="m-2 px-4 py-2 btn btn-outline-warning" onclick="validateForm('approve')">
+                    <button type="button" name="action" value="approve with review" class="m-2 px-4 py-2 btn btn-outline-warning" onclick="validateForm('approve with review')">
                         Approve with Review
                     </button>
-                    <button type="button" name="action" value="reject" class="m-2 px-4 py-2 btn btn-outline-danger" onclick="validateForm('reject')">
-                        Not Approved
+                    <button type="button" name="action" value="not approve" class="m-2 px-4 py-2 btn btn-outline-danger" onclick="validateForm('not approve')">
+                        Not Approve
                     </button>
                 </div>
             </div>
@@ -371,8 +372,8 @@
             const input = document.getElementById('action')
             input.value = value;
             Swal.fire({
-                title: value === 'approve' ? "Do you want to approve?" : "Do you want to reject?",
-                text: "You won't be able to revert this!",
+                title: "Form " + value,
+                text: "Are you sure you want to " + value + "?",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#26D639',
@@ -393,7 +394,7 @@
                 warning.classList.remove('d-none'); 
             }else{
                 warning.classList.add('d-none'); 
-                // submitForm(type);
+                submitForm(type);
             }
         }
 
@@ -424,6 +425,7 @@
                     no_reg: no_reg
                 },
                 success: function(response) {
+                    console.log(response);
                     // No_Reg
                     $('#no_reg_text').text(no_reg);
                     
@@ -489,10 +491,10 @@
                                 approvedCell = newDiv;
                             }else if(detail.status === 'approve with review'){
                                 approvedWithReviewCell = newDiv;
-                                commentsCell = detail.comments;
+                                commentsCell = detail.comment;
                             }else{
                                 notApprovedCell = newDiv;
-                                commentsCell = detail.comments;
+                                commentsCell = detail.comment;
                             }
                         }
                         approverTable.row.add([

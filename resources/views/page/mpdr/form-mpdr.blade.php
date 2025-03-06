@@ -431,10 +431,10 @@
                                 approvedCell = newDiv;
                             }else if(detail.status === 'approve with review'){
                                 approvedWithReviewCell = newDiv;
-                                commentsCell = detail.comments;
+                                commentsCell = detail.comment;
                             }else{
                                 notApprovedCell = newDiv;
-                                commentsCell = detail.comments;
+                                commentsCell = detail.comment;
                             }
                         }
                         approverTable.row.add([

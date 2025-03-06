@@ -360,11 +360,11 @@
                     <button type="button" name="action" value="approve" class="m-2 px-4 py-2 btn btn-outline-success" onclick="submitForm('approve')">
                         Approve
                     </button>
-                    <button type="button" name="action" value="approve" class="m-2 px-4 py-2 btn btn-outline-warning" onclick="validateForm('approve with review')">
+                    <button type="button" name="action" value="approve with review" class="m-2 px-4 py-2 btn btn-outline-warning" onclick="validateForm('approve with review')">
                         Approve with Review
                     </button>
-                    <button type="button" name="action" value="reject" class="m-2 px-4 py-2 btn btn-outline-danger" onclick="validateForm('reject')">
-                        Not Approved
+                    <button type="button" name="action" value="not approve" class="m-2 px-4 py-2 btn btn-outline-danger" onclick="validateForm('not approve')">
+                        Not Approve
                     </button>
                 </div>
             </div>

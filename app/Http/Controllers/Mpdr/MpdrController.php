@@ -37,7 +37,6 @@ class MpdrController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request, Auth::user()->id);
         $validated = $request->validate([
             'no_reg' => 'required|string',
             'productName' => 'required|string|max:255',
@@ -165,7 +164,7 @@ class MpdrController extends Controller
                     'approver_nik' => $approver->approver_nik,
                     'approver_name' => $approver->approver_name,
                     'status' => $approver->approver_status == 'Active' ? 'Active' : 'Vacant',
-                    'token' => Str::uuid()
+                    'token' => $approver->approver_status == 'Active' ? Str::uuid() : null
                 ]);
             }
 
@@ -372,22 +371,51 @@ class MpdrController extends Controller
         $userLogin = Auth::user();
         $nik = $userLogin->nik;
         $forms = null;
+        
         /** @var User $userLogin */
-        if(!$userLogin->hasRole('approver')){
-            $forms = MpdrForm::where('status', 'In Approval')
-            ->whereHas('initiator', function ($query) use($nik){
-                $query->where('initiator_nik', $nik)->where('status', 'pending');
+        $forms = MpdrForm::where('status', 'In Approval')
+        ->whereHas('initiatorDetail', function ($query) use($nik){
+            $query->where('initiator_nik', $nik)->where('status', 'pending');
+        })
+        ->get();
+        
+        if($userLogin->hasRole('gm'))
+        {
+            $additionalForms = MpdrForm::with('initiatorDetail')->where('status', 'In Approval')
+            ->whereHas('initiatorDetail', function ($query) use($nik){
+                $query->whereIn('status', ['approve', 'approve with review']);
+            })
+            ->whereDoesntHave('approvedDetail', function ($query) use($nik){
+                $query->where('approver_nik', '!=', $nik)
+                    ->where('status', 'pending');
+            })->whereHas('approvedDetail', function ($query) use($nik){
+                $query->where('approver_nik', '=', $nik)
+                    ->where('status', 'pending');
             })
             ->get();
-        }else{
-            $forms = MpdrForm::where('status', 'In Approval')
-            ->whereHas('initiator', function ($query) use($nik){
-                $query->where('status', 'approve');
+            
+            $allForms = $forms->merge($additionalForms);
+
+            if($allForms){
+                return response()->json($allForms);
+            }
+        }
+        else if($userLogin->hasRole('approver'))
+        {
+            $additionalForms = MpdrForm::where('status', 'In Approval')
+            ->whereHas('initiatorDetail', function ($query) use($nik){
+                $query->whereIn('status', ['approve', 'approve with review']);
             })
             ->whereHas('approvedDetail', function ($query) use($nik){
                 $query->where('approver_nik', $nik)->where('status', 'pending');
             })
             ->get();
+            
+            $allForms = $forms->merge($additionalForms);
+
+            if($allForms){
+                return response()->json($allForms);
+            }
         }
         
         if($forms){
@@ -397,6 +425,114 @@ class MpdrController extends Controller
         return response()->json("Tidak ada Form");
     }
 
+    public function approveForm(Request $request, $no_reg)
+    {
+        
+        DB::beginTransaction();
+        try {
+            
+            /** @var User $userLogin */
+            $userLogin = Auth::user();
+            $nik = $userLogin->nik;
+
+            // Mengambil form
+            $form = MpdrForm::with('initiatorDetail')
+            ->where('no', $no_reg)
+            ->where('status', 'In Approval')
+            ->first();
+
+            if(!$form){
+                DB::rollback();
+                Alert::toast("Form is not found.", 'error');
+                return back();
+            }
+
+            // Cek apakah status initiator pending
+            if($form->initiatorDetail->status == 'pending'){
+                // Cek apakah yang login initiator
+                if($form->initiatorDetail->initiator_nik == $nik){
+                    $form->initiatorDetail->status = $request->input('action');
+                    $form->initiatorDetail->approved_date = now();
+                    if($request->input('action') !== 'approve'){
+                        $form->initiatorDetail->comment = $request->input('comment');
+                    }
+                    $form->initiatorDetail->token = null;
+                    $form->initiatorDetail->save();
+                    if($request->input('action') !== 'approve' && $request->input('action') !== 'approve with review'){
+                        $form->status = 'Rejected';
+                        $form->save();
+                    }
+                }else{
+                    DB::rollback();
+                    Alert::toast("User is not allowed to approve.", 'error');
+                    return back();
+                }
+            }else{
+                // Cek apakah yang login punya role approver
+                if($userLogin->hasRole('approver')){
+                    $form = MpdrForm::with('initiatorDetail')
+                    ->where('no', $no_reg)
+                    ->where('status', 'In Approval')
+                    ->first();
+
+                    // Cari nik yang sesuai
+                    foreach($form->approvedDetail as $detail){
+                        if($detail->approver_nik === $nik){
+                            // Jika status vacant maka tidak bisa approve
+                            if($detail->status === 'vacant'){
+                                DB::rollback();
+                                Alert::toast("User status is vacant.", 'error');
+                                return back();
+                            }
+                            $detail->status = $request->input('action');
+                            $detail->approved_date = now();
+                            if($request->input('action') !== 'approve'){
+                                $detail->comment = $request->input('comment');
+                            }
+                            $detail->token = null;
+                            $detail->save();
+                            break;
+                        }
+                    }
+
+                    // Cek apakah form status approve atau reject
+                    if($request->input('action') === 'approve' || $request->input('action') === 'approve with review'){
+                        $notNull = True;
+                        foreach($form->approvedDetail as $detail){
+                            if($detail->status == 'pending' || $detail->status == 'not approve'){
+                                $notNull = False;
+                                break;
+                            }
+                        }
+                        // Status form Approved jika tidak ada yang pending / not approve
+                        if($notNull){
+                            $form->status = 'Approved';
+                        }
+                    }else{
+                        $form->status = 'Rejected';
+                    }
+                    $form->save();
+                }else{
+                    DB::rollback();
+                    Alert::toast("User is not allowed to approve.", 'error');
+                    return redirect()->route('mpdr.approval');
+                }
+                
+            }
+            
+            
+            DB::commit();
+            Alert::toast('Form successfully ' . $request->input('action') . '!', 'success');
+            return redirect()->route('mpdr.approval');
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            // dd($e);
+            DB::rollback();
+            Alert::toast('There was an error saving the form.'.$e->getMessage(), 'error');
+            return back();
+        }
+        
+    }
     
     public function viewApprovalForm($no_reg)
     {

@@ -35,7 +35,7 @@ class MpdrForm extends Model
         return $this->belongsTo(MpdrRevision::class);
     }
     
-    public function initiator()
+    public function initiatorDetail()
     {
         return $this->hasOne(MpdrInitiatorApprovedDetail::class, 'form_id');
     }
