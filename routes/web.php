@@ -15,7 +15,10 @@ use App\Http\Controllers\Master\SectionController;
 use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\Master\IdeaCountsController;
 use App\Http\Controllers\Mpdr\MpdrController;
+use App\Http\Controllers\Mpdr\MpdrApprovalController;
+use App\Http\Controllers\Mpdr\MpdrInitiatorController;
 use App\Http\Controllers\PreMpdr\PreMpdrController;
+use App\Http\Controllers\PreMpdr\PreMpdrApprovalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Rs\RequistionSlipController;
 use Illuminate\Support\Facades\Artisan;
@@ -90,20 +93,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/log', [PreMpdrController::class, 'log'])->name('prempdr.log');
         Route::POST('/store', [PreMpdrController::class, 'store'])->name('prempdr.store');
         Route::get('/print-{no_reg}', [PreMpdrController::class, 'print'])->name('prempdr.print');
-        Route::get('/form-approval-{no_reg}', [PreMpdrController::class, 'viewApprovalForm'])->name('prempdr.approval.form.view');
-        Route::POST('/form-approve-{no_reg}', [PreMpdrController::class, 'approveForm'])->name('prempdr.form.approve');
         Route::get('/form-{no_reg}', [PreMpdrController::class, 'show'])->name('prempdr.form');
 
         Route::get('/template', [PreMpdrController::class, 'template'])->name('prempdr.template');
         Route::get('/no_reg', [PreMpdrController::class, 'noReg'])->name('prempdr.noReg');
 
         Route::get('/getFormList', [PreMpdrController::class, 'getFormList'])->name('prempdr.form.list');
-        Route::get('/getApproverListData', [PreMpdrController::class, 'getApproverListData'])->name('prempdr.approver.list.data');
-        Route::get('/getApprovalListData', [PreMpdrController::class, 'getApprovalListData'])->name('prempdr.approval.list.data');
-        Route::get('/getApprovalFormData', [PreMpdrController::class, 'getApprovalFormData'])->name('prempdr.approval.form.data');
         Route::get('/getFormData', [PreMpdrController::class, 'getFormData'])->name('prempdr.form.data');
         Route::get('/getReportData', [PreMpdrController::class, 'getReportData'])->name('prempdr.report.data');
         Route::get('/print-data', [PreMpdrController::class, 'getPrintData'])->name('prempdr.print.data');
+
+        
+        Route::get('/approval-form-{no_reg}', [PreMpdrApprovalController::class, 'viewApprovalForm'])->name('prempdr.approval.form.view');
+        Route::POST('/approve-form-{no_reg}', [PreMpdrApprovalController::class, 'approveForm'])->name('prempdr.form.approve');
+        Route::get('/getApproverListData', [PreMpdrApprovalController::class, 'getApproverListData'])->name('prempdr.approver.list.data');
+        Route::get('/getApprovalListData', [PreMpdrApprovalController::class, 'getApprovalListData'])->name('prempdr.approval.list.data');
+        Route::get('/getApprovalFormData', [PreMpdrApprovalController::class, 'getApprovalFormData'])->name('prempdr.approval.form.data');
     });
 
 
@@ -116,28 +121,33 @@ Route::middleware('auth')->group(function () {
         Route::patch('/update/{id}', [MpdrController::class, 'update'])->name('mpdr.update');
         Route::delete('/destroy/{id}', [MpdrController::class, 'destroy'])->name('mpdr.destroy');
         Route::get('/report', [MpdrController::class, 'report'])->name('mpdr.reports');
-        Route::get('/approval', [MpdrController::class, 'approval'])->name('mpdr.approval');
         Route::get('/log', [MpdrController::class, 'log'])->name('mpdr.log');
         Route::POST('/store', [MpdrController::class, 'store'])->name('mpdr.store');
-        Route::get('/approver', [MpdrController::class, 'approver'])->name('mpdr.approver');
         Route::get('/form', [MpdrController::class, 'viewForm'])->name('mpdr.form.view');
-        Route::get('/print', [MpdrController::class, 'print'])->name('mpdr.print');
+        Route::get('/print-{no_reg}', [MpdrController::class, 'print'])->name('mpdr.print');
 
         Route::get('/no_reg', [MpdrController::class, 'noReg'])->name('mpdr.noReg');
 
         Route::get('/template', [MpdrController::class, 'template'])->name('mpdr.template');
-        Route::POST('/updateApproverOrder', [MpdrController::class, 'updateApproverOrder'])->name('mpdr.approver.update.order');
-        Route::get('/getSelectedApproverList', [MpdrController::class, 'getSelectedApproverList'])->name('mpdr.selected.approver.list');
-        Route::get('/getApproverListData', [MpdrController::class, 'getApproverListData'])->name('mpdr.approver.list.data');
-        Route::get('/getApprovalListData', [MpdrController::class, 'getApprovalListData'])->name('mpdr.approval.list.data');
-        Route::get('/getInitiatorList', [MpdrController::class, 'getInitiatorList'])->name('mpdr.initiator.list.data');
         Route::get('/getFormList', [MpdrController::class, 'getFormList'])->name('mpdr.form.list');
         Route::get('/getFormData', [MpdrController::class, 'getFormData'])->name('mpdr.form.data');
+        Route::get('/getReportData', [MpdrController::class, 'getReportData'])->name('mpdr.report.data');
+        Route::get('/print-data', [MpdrController::class, 'getPrintData'])->name('mpdr.print.data');
 
         
-        Route::POST('/form-approve-{no_reg}', [MpdrController::class, 'approveForm'])->name('mpdr.form.approve');
-        Route::get('/form-approval-{no_reg}', [MpdrController::class, 'viewApprovalForm'])->name('mpdr.approval.form.view');
         Route::get('/form-{no_reg}', [MpdrController::class, 'show'])->name('mpdr.form');
+
+        
+        Route::get('/getInitiatorList', [MpdrInitiatorController::class, 'getInitiatorList'])->name('mpdr.initiator.list.data');
+
+        Route::POST('/approve-form-{no_reg}', [MpdrApprovalController::class, 'approveForm'])->name('mpdr.form.approve');
+        Route::get('/getApprovalListData', [MpdrApprovalController::class, 'getApprovalListData'])->name('mpdr.approval.list.data');
+        Route::POST('/updateApproverOrder', [MpdrApprovalController::class, 'updateApproverOrder'])->name('mpdr.approver.update.order');
+        Route::get('/getSelectedApproverList', [MpdrApprovalController::class, 'getSelectedApproverList'])->name('mpdr.selected.approver.list');
+        Route::get('/getApproverListData', [MpdrApprovalController::class, 'getApproverListData'])->name('mpdr.approver.list.data');
+        Route::get('/approval-form-{no_reg}', [MpdrApprovalController::class, 'viewApprovalForm'])->name('mpdr.approval.form.view');
+        Route::get('/approval', [MpdrApprovalController::class, 'approval'])->name('mpdr.approval');
+        Route::get('/approver', [MpdrApprovalController::class, 'approver'])->name('mpdr.approver');
     });
 
 

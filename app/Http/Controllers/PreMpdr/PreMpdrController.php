@@ -240,59 +240,6 @@ class PreMpdrController extends Controller
     {
         return view('page.pre-mpdr.print-prempdr')->with('no_reg', $no_reg);
     }
-
-    public function viewApprovalForm($no_reg)
-    {
-        confirmDelete();
-        return view('page.pre-mpdr.form-approval-prempdr')->with('no_reg', $no_reg);
-    }
-
-    public function approveForm(Request $request, $no_reg)
-    {
-        
-        DB::beginTransaction();
-        try {
-            $nik = Auth::user()->nik;
-            $form = PreMpdrForm::with('approvedDetail')->where('no', $no_reg)->first();
-            
-            foreach($form->approvedDetail as $detail){
-                if($detail->approver === $nik){
-                    $detail->status = $request->input('action');
-                    $detail->approved_date = now();
-                    if($request->input('action') !== 'approve'){
-                        $detail->comment = $request->input('comment');
-                    }
-                    $detail->save();
-                    break;
-                }
-            }
-            if($request->input('action') === 'approve' || $request->input('action') === 'approve with review'){
-                $notNull = True;
-                foreach($form->approvedDetail as $detail){
-                    if(!$detail->status){
-                        $notNull = False;
-                        break;
-                    }
-                }
-                if($notNull){
-                    $form->status = 'Approved';
-                }
-            }else{
-                $form->status = 'Rejected';
-            }
-            $form->save();
-            DB::commit();
-            Alert::toast('Form successfully ' . $request->input('action') . '!', 'success');
-            return redirect()->route('prempdr.approval');
-        } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi kesalahan
-            dd($e);
-            DB::rollback();
-            Alert::toast('There was an error saving the form.'.$e->getMessage(), 'error');
-            return back();
-        }
-        
-    }
     
     public function noReg()
     {
@@ -343,6 +290,7 @@ class PreMpdrController extends Controller
         $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver', 'approvedDetail')->where('user_id', Auth::user()->id)->get();
         if($form){
             $form = $form->map(function($item) {
+                /** @var PreMpdrForm $item */
                 $item->new_created_at = $item->created_at->format('j F Y');
                 return $item;
             });
@@ -355,47 +303,6 @@ class PreMpdrController extends Controller
     public function template()
     {
         return view('page.pre-mpdr.template-form-prempdr');
-    }
-
-    public function getApproverListData()
-    {
-        $approver = User::role('approver')->where('status', 'Active')->get();
-        if($approver){
-            return response()->json($approver);
-        }
-
-        return response()->json("Tidak ada data");
-    }
-
-    public function getApprovalListData()
-    {
-        if(!Auth::user()->hasRole('approver')){
-            return response()->json();
-        }
-
-        $nik = Auth::user()->nik;
-        
-        $form = PreMpdrForm::where('status', 'In Approval')
-        ->whereExists(function ($query) use($nik) {
-            $query->select(DB::raw('1')) 
-                ->from('pre_mpdr_approved_details')
-                ->whereRaw('pre_mpdr_forms.id = pre_mpdr_approved_details.form_id')
-                ->whereNull('pre_mpdr_approved_details.status')
-                ->where('pre_mpdr_approved_details.approver', $nik)
-                ->where('level', DB::raw('(SELECT COUNT(status) + 1 FROM pre_mpdr_approved_details where pre_mpdr_forms.id = pre_mpdr_approved_details.form_id)'));
-        })
-        ->get();
-        
-        if($form){
-            return response()->json($form);
-        }
-
-        return response()->json("Tidak ada Form");
-    }
-
-    public function getApprovalFormData($no_reg)
-    {
-        return view('page.pre-mpdr.form-approval-prempdr')->with('no_reg', $no_reg);
     }
 
     public function getFormList()

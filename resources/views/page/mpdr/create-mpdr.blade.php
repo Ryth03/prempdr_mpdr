@@ -134,7 +134,7 @@
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="channel" id="channel4" value="FSBC-direct">
+                                <input class="form-check-input" type="radio" name="channel" id="channel4" value="FSBC-Direct">
                                 <label class="form-check-label" for="channel4">
                                 FSBC-Direct
                                 </label>

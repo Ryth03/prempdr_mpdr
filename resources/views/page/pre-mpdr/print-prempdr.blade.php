@@ -47,9 +47,9 @@
                             <h4>PRODUCT DEVELOPMENT REQUEST</h4>
                         </div>
                         <div class="col-3 d-flex flex-column justify-content-around">
-                                <p class="my-auto">No : <span id="revision-no"></span></p>
-                                <p class="my-auto">Revision : <span id="revision-count"></span></p>
-                                <p class="my-auto">Date : <span id="revision-date"></span></p>
+                            <p class="my-auto">No : <span id="revision-no"></span></p>
+                            <p class="my-auto">Revision : <span id="revision-count"></span></p>
+                            <p class="my-auto">Date : <span id="revision-date"></span></p>
                         </div>
                     </td>
                 </tr>
@@ -352,7 +352,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             function makeAllReadonly() {
                 // Menjadikan semua elemen input dan textarea readonly
-                var inputs = document.querySelectorAll('#prempdr-form input, #prempdr-form textarea');  // Pilih semua input
+                var inputs = document.querySelectorAll('#prempdr-main input, #prempdr-main textarea');  // Pilih semua input
                 inputs.forEach(function(input) {
                     if (input.type === 'radio') {
                         if (!input.checked) {

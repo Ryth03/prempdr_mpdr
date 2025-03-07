@@ -219,21 +219,9 @@ class MpdrController extends Controller
         return view('page.mpdr.report-mpdr');
     }
 
-    public function approval()
-    {
-        return view('page.mpdr.approval-mpdr');
-    }
-
     public function log()
     {
         return view('page.mpdr.log-mpdr');
-    }
-
-    public function approver()
-    {
-        $users = User::role('approver')->get();
-        confirmDelete();
-        return view('page.mpdr.approver-mpdr');
     }
 
     public function viewForm()
@@ -241,14 +229,9 @@ class MpdrController extends Controller
         return view('page.mpdr.form-mpdr');
     }
     
-    public function print()
+    public function print($no_reg)
     {
-        return view('page.mpdr.print-mpdr');
-    }
-
-    public function viewFormApproval()
-    {
-        return view('page.mpdr.form-approval-mpdr');
+        return view('page.mpdr.print-mpdr')->with('no_reg', $no_reg);
     }
 
     public function template()
@@ -299,244 +282,30 @@ class MpdrController extends Controller
 
         return response()->json("Tidak ada Form");
     }
-
-    public function getApproverListData()
-    {
-        $approver = User::role('approver')->where('status', 'Active')->get();
-        if($approver){
-            return response()->json($approver);
-        }
-
-        return response()->json("Tidak ada data");
-    }
     
-    public function getSelectedApproverList()
+
+    public function getReportData()
     {
-        $user_nik = Auth::user()->nik;
-        $approverList = MpdrApprover::select('approver_nik', 'approver_name', 'approver_status')->where('user_nik', $user_nik)->get()->toArray();
-        if($approverList){
-            return response()->json($approverList);
-        }
-        return response()->json("Tidak ada data");
-    }
-    
-    public function updateApproverOrder(Request $request)
-    {
-        $user_nik = Auth::user()->nik;
-        
-        // Mulai transaction untuk memastikan integritas data
-        DB::beginTransaction();
-        try {
-
-            MpdrApprover::where('user_nik', $user_nik)->delete();
-
-            $approver_niks = $request->input('nik');
-            $approver_names = $request->input('name');
-            $approver_statuses = $request->input('status');
-            foreach($approver_niks as $index => $approver_nik){
-                MpdrApprover::create([
-                    'user_nik' => $user_nik,
-                    'approver_nik' => $approver_niks[$index],
-                    'approver_name' => $approver_names[$index],
-                    'approver_status' => $approver_statuses[$index]
-                ]);
-            }
-            DB::commit();
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Approver saved successfully!'
-            ]);
-        } catch (\Exception $e) {
-            dd($e);
-            // Rollback transaksi jika terjadi kesalahan
-            DB::rollback();
-            
-            return response()->json([
-                'status' => 'error',
-                'message' => 'There was an error saving approver.'.$e->getMessage()
-            ]);
-        }
-    }
-
-    public function getInitiatorList(){
-        $initiatorList = User::where('status', 'Active')->get(); //role('approver')->
-        if($initiatorList){
-            return response()->json($initiatorList);
-        }
-        return response()->json("Tidak ada data");
-    }
-
-    public function getApprovalListData()
-    {
-        $userLogin = Auth::user();
-        $nik = $userLogin->nik;
-        $forms = null;
-        
-        /** @var User $userLogin */
-        $forms = MpdrForm::where('status', 'In Approval')
-        ->whereHas('initiatorDetail', function ($query) use($nik){
-            $query->where('initiator_nik', $nik)->where('status', 'pending');
-        })
-        ->get();
-        
-        if($userLogin->hasRole('gm'))
-        {
-            $additionalForms = MpdrForm::with('initiatorDetail')->where('status', 'In Approval')
-            ->whereHas('initiatorDetail', function ($query) use($nik){
-                $query->whereIn('status', ['approve', 'approve with review']);
-            })
-            ->whereDoesntHave('approvedDetail', function ($query) use($nik){
-                $query->where('approver_nik', '!=', $nik)
-                    ->where('status', 'pending');
-            })->whereHas('approvedDetail', function ($query) use($nik){
-                $query->where('approver_nik', '=', $nik)
-                    ->where('status', 'pending');
-            })
-            ->get();
-            
-            $allForms = $forms->merge($additionalForms);
-
-            if($allForms){
-                return response()->json($allForms);
-            }
-        }
-        else if($userLogin->hasRole('approver'))
-        {
-            $additionalForms = MpdrForm::where('status', 'In Approval')
-            ->whereHas('initiatorDetail', function ($query) use($nik){
-                $query->whereIn('status', ['approve', 'approve with review']);
-            })
-            ->whereHas('approvedDetail', function ($query) use($nik){
-                $query->where('approver_nik', $nik)->where('status', 'pending');
-            })
-            ->get();
-            
-            $allForms = $forms->merge($additionalForms);
-
-            if($allForms){
-                return response()->json($allForms);
-            }
-        }
-        
-        if($forms){
-            return response()->json($forms);
+        $form = MpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market','approvedDetail')->where('user_id', Auth::user()->id)->get();
+        if($form){
+            $form = $form->map(function($item) {  
+                /** @var MpdrForm $item */
+                $item->new_created_at = $item->created_at->format('j F Y');
+                return $item;
+            });
+            return response()->json($form);
         }
 
         return response()->json("Tidak ada Form");
     }
 
-    public function approveForm(Request $request, $no_reg)
+    public function getPrintData(Request $request)
     {
-        
-        DB::beginTransaction();
-        try {
-            
-            /** @var User $userLogin */
-            $userLogin = Auth::user();
-            $nik = $userLogin->nik;
-
-            // Mengambil form
-            $form = MpdrForm::with('initiatorDetail')
-            ->where('no', $no_reg)
-            ->where('status', 'In Approval')
-            ->first();
-
-            if(!$form){
-                DB::rollback();
-                Alert::toast("Form is not found.", 'error');
-                return back();
-            }
-
-            // Cek apakah status initiator pending
-            if($form->initiatorDetail->status == 'pending'){
-                // Cek apakah yang login initiator
-                if($form->initiatorDetail->initiator_nik == $nik){
-                    $form->initiatorDetail->status = $request->input('action');
-                    $form->initiatorDetail->approved_date = now();
-                    if($request->input('action') !== 'approve'){
-                        $form->initiatorDetail->comment = $request->input('comment');
-                    }
-                    $form->initiatorDetail->token = null;
-                    $form->initiatorDetail->save();
-                    if($request->input('action') !== 'approve' && $request->input('action') !== 'approve with review'){
-                        $form->status = 'Rejected';
-                        $form->save();
-                    }
-                }else{
-                    DB::rollback();
-                    Alert::toast("User is not allowed to approve.", 'error');
-                    return back();
-                }
-            }else{
-                // Cek apakah yang login punya role approver
-                if($userLogin->hasRole('approver')){
-                    $form = MpdrForm::with('initiatorDetail')
-                    ->where('no', $no_reg)
-                    ->where('status', 'In Approval')
-                    ->first();
-
-                    // Cari nik yang sesuai
-                    foreach($form->approvedDetail as $detail){
-                        if($detail->approver_nik === $nik){
-                            // Jika status vacant maka tidak bisa approve
-                            if($detail->status === 'vacant'){
-                                DB::rollback();
-                                Alert::toast("User status is vacant.", 'error');
-                                return back();
-                            }
-                            $detail->status = $request->input('action');
-                            $detail->approved_date = now();
-                            if($request->input('action') !== 'approve'){
-                                $detail->comment = $request->input('comment');
-                            }
-                            $detail->token = null;
-                            $detail->save();
-                            break;
-                        }
-                    }
-
-                    // Cek apakah form status approve atau reject
-                    if($request->input('action') === 'approve' || $request->input('action') === 'approve with review'){
-                        $notNull = True;
-                        foreach($form->approvedDetail as $detail){
-                            if($detail->status == 'pending' || $detail->status == 'not approve'){
-                                $notNull = False;
-                                break;
-                            }
-                        }
-                        // Status form Approved jika tidak ada yang pending / not approve
-                        if($notNull){
-                            $form->status = 'Approved';
-                        }
-                    }else{
-                        $form->status = 'Rejected';
-                    }
-                    $form->save();
-                }else{
-                    DB::rollback();
-                    Alert::toast("User is not allowed to approve.", 'error');
-                    return redirect()->route('mpdr.approval');
-                }
-                
-            }
-            
-            
-            DB::commit();
-            Alert::toast('Form successfully ' . $request->input('action') . '!', 'success');
-            return redirect()->route('mpdr.approval');
-        } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi kesalahan
-            // dd($e);
-            DB::rollback();
-            Alert::toast('There was an error saving the form.'.$e->getMessage(), 'error');
-            return back();
+        $form = MpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approvedDetail')->where('no', $request->input('id'))->first();
+        if($form){
+            return response()->json($form);
         }
-        
-    }
-    
-    public function viewApprovalForm($no_reg)
-    {
-        confirmDelete();
-        return view('page.mpdr.form-approval-mpdr')->with('no_reg', $no_reg);
+
+        return response()->json("Tidak ada Form");
     }
 }

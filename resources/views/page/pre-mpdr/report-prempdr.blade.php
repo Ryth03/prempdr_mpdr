@@ -504,8 +504,16 @@
                 });
             });
 
+            // Fungsi untuk menghapus data dari tampilan form
+            function clearForm(){
+                $('#prempdr-form input[type="radio"]').prop('checked', false).prop('disabled', true);
+                $('#prempdr-form textarea').text('');
+                $('#prempdr-form text').val('');
+            }
+
+            // Fungsi untuk mengganti data pada tampilan form
             function changeForm(index){
-                // Get Form 
+                clearForm();
                 var form = forms[index];
 
                 $('#title-report').text(form.project_name);
@@ -525,18 +533,18 @@
                 $('#rationalForDevelopment').html(form.detail.rational_for_development);
                 $('#targetLaunch').val(form.detail.target_launch);
 
-                $(`#${form.category.category}`).attr('checked', true).attr('disabled', false);
+                $(`[id="${form.category.category}"]`).prop('checked', true).prop('disabled', false);
                 $('#productCategoryText').val(form.category.other);
 
-                $(`#${form.channel.category}`).attr('checked', true).attr('disabled', false);
+                $(`#${form.channel.category}`).prop('checked', true).prop('disabled', false);
                 $('#country').val(form.channel.country);
 
                 $('#productDescription').html(form.description.product_description);
                 $('#usageDescription').val(form.description.usage_description);
-                    $('#storageTemperature').val(form.description.storage_temperature);
-                    $('#deliveryTemperature').val(form.description.delivery_temperature);
+                $('#storageTemperature').val(form.description.storage_temperature);
+                $('#deliveryTemperature').val(form.description.delivery_temperature);
                 
-                $(`#${form.certification.category}`).attr('checked', true).attr('disabled', false);
+                $(`#${form.certification.category}`).prop('checked', true).prop('disabled', false);
                 $('#certificationText').val(form.certification.other);
 
                 // Competitor's Product
@@ -549,8 +557,8 @@
 
                 // Detailed Packaging
                 $('#weightProduct').val(form.packaging.weight);
-                $(`#${form.packaging.category}Packaging`).attr('checked', true).attr('disabled', false);
-                $(`#${form.packaging.category}PackagingText`).val(form.packaging.detail);
+                $(`#${form.packaging.category}Packaging`).prop('checked', true).prop('disabled', false);
+                $(`#${form.packaging.category}PackagingText`).text(form.packaging.detail);
                 $('#productVariation').val(form.packaging.product_variation);
 
                 

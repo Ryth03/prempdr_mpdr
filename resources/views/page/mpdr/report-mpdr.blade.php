@@ -113,14 +113,14 @@
                                 <h4 class="invoice-number">#<span id="id-report">---</span></h4>
                             </div>
                         </div>
-                        <div id="prempdr-form" class="border border-4 border-black w-100 mb-4">
-                            <header id="prempdr-header" class="row">
+                        <div id="mpdr-form" class="border border-4 border-black w-100 mb-4">
+                            <header id="mpdr-header" class="row">
                                 <div class="col-3">
                                     <img src="{{ asset('assets') }}/images/logos/logoputih.png" class="dark-logo img-fluid p-0" alt="Logo-Dark">
                                     <img src="{{ asset('assets') }}/images/logos/logohitam.png" class="light-logo img-fluid p-0" alt="Logo-light">
                                 </div>
                                 <div class="col-5 fw-bold border-start border-end border-3 border-black text-center d-flex flex-column justify-content-center align-items-center">
-                                    <h4>Pre-MARKETING</h4>
+                                    <h4>MARKETING</h4>
                                     <h4>PRODUCT DEVELOPMENT REQUEST</h4>
                                 </div>
                                 <div class="col-3 d-flex flex-column justify-content-around">
@@ -129,27 +129,27 @@
                                         <p class="my-auto">Date : <span id="revision-date"></span></p>
                                 </div>
                             </header>
-                            <main id="prempdr-main" class="d-flex flex-column gap-3 border-top border-4 border-black p-2">
-                                <div class="row">  
-                                    <div class="col-6">
-                                        <label for="projectName" class="form-label">Project Name:</label>
-                                        <input type="text" class="form-control" name="projectName" id="projectName"> 
+                            <main id="mpdr-main" class="d-flex flex-column gap-3 border-top border-4 border-black p-2">
+                                <div class="d-flex justify-content-end">
+                                    <label for="no_reg" class="form-label">No Reg: <span id="no_reg_text"></span></label>
+                                    <input type="hidden" id="no_reg" name="no_reg" value="" readonly>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 col-md-5">
+                                        <label for="productName" class="form-label">Product Name:</label>
+                                        <input type="text" class="form-control" id="productName" name="productName" required> 
                                     </div>
-                                    <div class="col-2">
+                                    <div class="col-12 col-md-2">
                                         <label for="levelPriority" class="form-label">Level Priority:</label>
-                                        <input type="text" class="form-control" name="levelPriority" id="levelPriority"> 
+                                        <input type="text" class="form-control" id="levelPriority" name="levelPriority" required> 
                                     </div>
-                                    <div class="col-4 d-flex justify-content-end">
-                                        <label for="projectName" class="form-label">No Reg: <span id="no_reg_text">25PREMPDR0000</span></label>
-                                        <input type="hidden" id="no_reg" name="no_reg" value="" readonly>
+                                    <div class="col-12 col-md-5">
+                                        <label for="initiator" class="form-label">Initiator:</label>
+                                        <input type="text" class="form-control" id="initiator" name="initiator" required>
                                     </div>
-                                </div>  
-                                <div class="">
-                                    <label for="brandName" class="form-label">Proposed BRAND Name:</label>
-                                    <input type="text" class="form-control" name="initiator" id="brandName"> 
                                 </div>
                                 <div id="rational">
-                                    <label class="form-label">Rational For Development: </label>
+                                    <label for="rationalForDevelopment" class="form-label">Rational For Development: </label>
                                     <textarea class="form-control no-resize" name="rationalForDevelopment" id="rationalForDevelopment" rows="2"></textarea>
                                 </div>
                                 <div class="row">
@@ -229,7 +229,7 @@
                                 <h5>GENERAL PRODUCT DESCRIPTION AND FUNCTION</h5>
                                 <div id="productDescriptionDiv">
                                     <label class="form-label">Product Description <span class="fw-normal">(Form/Color/Flavor brief)</span>: </label>
-                                    <textarea class="form-control no-resize" id="productDescription" rows="3"></textarea>
+                                    <div id="productDescription"></div>
                                 </div>
                                 <div id="usage">
                                     <label class="form-label">Usage Description <span class="fw-normal">(Application in customer)</span>: </label>
@@ -366,7 +366,7 @@
                                     <input type="text" class="form-control" name="targetLaunchText"  id="targetLaunch">
                                 </div>
                             </main>
-                            <footer id="prempdr-footer" class="p-2 mb-1" style="border-top: 3px solid black ;">
+                            <footer id="mpdr-footer" class="p-2 mb-1" style="border-top: 3px solid black ;">
                                 <table id="approver" class="table table-striped nowrap">
                                     <thead>
                                         <tr>
@@ -378,34 +378,6 @@
                                         </tr>
                                     </thead>
                                     <tbody class="">
-                                        <tr id="initiator">
-                                            <td>Initiator</td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                        </tr>
-                                        <tr id="salesManager">
-                                            <td>Sales Manager</td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                        </tr>
-                                        <tr id="marketingManager">
-                                            <td>Marketing Manager</td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                        </tr>
-                                        <tr id="deptHead">
-                                            <td>Dept. Head</td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                        </tr>
                                     </tbody>
                                 </table>
                             </footer>
@@ -446,12 +418,22 @@
         <script src="https://cdn.datatables.net/2.2.1/js/dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/responsive/3.0.0/js/dataTables.responsive.js"></script>
         <script>
+            var approverTable = $('#approver').DataTable({
+                responsive: true,
+                ordering: false,
+                paging: false, 
+                searching: false,
+                info: false ,
+                columnDefs: [
+                    { targets: [1,2,3,4], className: 'text-center' }, 
+                ]
+            });
             var forms = "";
             // Ketika html sudah dimuat
             document.addEventListener('DOMContentLoaded', function() {
                 function makeAllReadonly() {
                     // Menjadikan semua elemen input dan textarea readonly
-                    var inputs = document.querySelectorAll('#prempdr-form input, #prempdr-form textarea');  // Pilih semua input
+                    var inputs = document.querySelectorAll('#mpdr-form input, #mpdr-form textarea');  // Pilih semua input
                     inputs.forEach(function(input) {
                         if (input.type === 'radio') {
                             if (!input.checked) {
@@ -467,7 +449,7 @@
 
                 // fetch data form
                 $.ajax({
-                    url: '{{ route('prempdr.report.data') }}', // URL ke controller
+                    url: '{{ route('mpdr.report.data') }}', // URL ke controller
                     method: 'GET',
                     success: function(response) {
                         forms = response;
@@ -482,7 +464,7 @@
                                     <i class="ti ti-folder fs-6"></i>
                                 </div>
                                 <div class="ms-3 d-inline-block w-75">
-                                    <h6 class="mb-0 invoice-customer">${form.project_name}</h6>
+                                    <h6 class="mb-0 invoice-customer">${form.product_name}</h6>
                                     <span class="fs-3 invoice-id text-truncate text-body-color d-block w-85">
                                         ${form.no}
                                     </span>
@@ -504,11 +486,20 @@
                 });
             });
 
+            // Fungsi untuk menghapus data dari tampilan form
+            function clearForm(){
+                approverTable.clear().draw();
+                $('#mpdr-form input[type="radio"]').prop('checked', false).prop('disabled', true);
+                $('#mpdr-form textarea').text('');
+                $('#mpdr-form text').val('');
+            }
+
+            // Fungsi untuk mengganti data pada tampilan form
             function changeForm(index){
-                // Get Form 
+                clearForm(); 
                 var form = forms[index];
 
-                $('#title-report').text(form.project_name);
+                $('#title-report').text(form.product_name);
                 $('#id-report').text(form.no);
 
                 $('#no_reg_text').text(form.no);
@@ -518,25 +509,25 @@
                 $('#revision-count').text(form.revision.revision);
                 $('#revision-date').text(form.revision.date);
                 
-                $('#projectName').val(form.project_name);
+                $('#productName').val(form.product_name);
                 $('#levelPriority').val(form.level_priority);
-                $('#brandName').val(form.brand_name);
+                $('#initiator').val(form.initiator);
 
-                $('#rationalForDevelopment').html(form.detail.rational_for_development);
+                $('#rationalForDevelopment').text(form.detail.rational_for_development);
                 $('#targetLaunch').val(form.detail.target_launch);
 
-                $(`#${form.category.category}`).attr('checked', true).attr('disabled', false);
+                $(`[id="${form.category.category}"]`).prop('checked', true).prop('disabled', false);
                 $('#productCategoryText').val(form.category.other);
 
-                $(`#${form.channel.category}`).attr('checked', true).attr('disabled', false);
+                $(`#${form.channel.category}`).prop('checked', true).prop('disabled', false);
                 $('#country').val(form.channel.country);
 
                 $('#productDescription').html(form.description.product_description);
                 $('#usageDescription').val(form.description.usage_description);
-                    $('#storageTemperature').val(form.description.storage_temperature);
-                    $('#deliveryTemperature').val(form.description.delivery_temperature);
+                $('#storageTemperature').val(form.description.storage_temperature);
+                $('#deliveryTemperature').val(form.description.delivery_temperature);
                 
-                $(`#${form.certification.category}`).attr('checked', true).attr('disabled', false);
+                $(`#${form.certification.category}`).prop('checked', true).prop('disabled', false);
                 $('#certificationText').val(form.certification.other);
 
                 // Competitor's Product
@@ -549,8 +540,8 @@
 
                 // Detailed Packaging
                 $('#weightProduct').val(form.packaging.weight);
-                $(`#${form.packaging.category}Packaging`).attr('checked', true).attr('disabled', false);
-                $(`#${form.packaging.category}PackagingText`).val(form.packaging.detail);
+                $(`#${form.packaging.category}Packaging`).prop('checked', true).prop('disabled', false);
+                $(`#${form.packaging.category}PackagingText`).text(form.packaging.detail);
                 $('#productVariation').val(form.packaging.product_variation);
 
                 
@@ -558,32 +549,40 @@
                 $('#expectedMargin').val(form.market.expected_margin);
                 $('#priceEstimate').val(form.market.price_estimate);
                 
-                var divId;
                 form.approved_detail.forEach(function(detail, index) {
-                    if(detail.approver == form.approver.initiator){
-                        divId = '#initiator';
-                    }else if(detail.approver == form.approver.sales_manager){
-                        divId = '#salesManager';
-                    }else if(detail.approver == form.approver.marketing_manager){
-                        divId = '#marketingManager';
-                    }else if(detail.approver == form.approver.department_head){
-                        divId = '#deptHead';
+                    // Memasukan data ke table approver
+                    var approvedCell = '';
+                    var approvedWithReviewCell  = '';
+                    var notApprovedCell = '';
+                    var commentsCell = '';
+                    if (detail.status !== 'pending' && detail.status !== 'vacant'){
+                        var newDiv = `
+                            <div class="d-flex flex-column">
+                                <div>${detail.status}</div>
+                                <div>${detail.approved_date}</div>
+                            </div>
+                        `;
+                        if(detail.status === 'approve'){
+                            approvedCell = newDiv;
+                        }else if(detail.status === 'approve with review'){
+                            approvedWithReviewCell = newDiv;
+                            commentsCell = detail.comment;
+                        }else{
+                            notApprovedCell = newDiv;
+                            commentsCell = detail.comment;
+                        }
                     }
-                    
-                    $(divId).find('td').eq(0).text(detail.name);
-                    if(detail.status === 'approve'){
-                        $(divId).find('td').eq(1).text(detail.approved_date);  // Kolom kedua
-                    }else if(detail.status === 'approve with review'){
-                        $(divId).find('td').eq(2).text(detail.approved_date); // Kolom ketiga
-                        $(divId).find('td').eq(4).text(detail.comment); // Kolom kelima
-                    }else{
-                        $(divId).find('td').eq(3).text(detail.approved_date); // Kolom keempat
-                        $(divId).find('td').eq(4).text(detail.comment); // Kolom kelima
-                    }
+                    approverTable.row.add([
+                        detail.approver_name,
+                        approvedCell ? approvedCell : '',
+                        approvedWithReviewCell ? approvedWithReviewCell : '',
+                        notApprovedCell ? notApprovedCell : '',
+                        commentsCell ? commentsCell : ''
+                    ]).draw();
                 });
 
                 // Print Button
-                $('#print-form').attr('href', "{{ route('prempdr.print', ['no_reg' => '__ID__']) }}".replace('__ID__', form.no));
+                $('#print-form').attr('href', "{{ route('mpdr.print', ['no_reg' => '__ID__']) }}".replace('__ID__', form.no));
                 $('#print-form').attr('target', '_blank');
             }
         </script>

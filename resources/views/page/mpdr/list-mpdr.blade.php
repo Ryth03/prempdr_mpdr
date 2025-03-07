@@ -47,6 +47,7 @@
                 <thead class="header-item">
                     <th>No</th>
                     <th>Project Name</th>
+                    <th>Status</th>
                     <th>Action</th>
                 </thead>
                 <tbody>
@@ -74,6 +75,18 @@
             columns: [
                 { data: 'no', name: 'no_reg' },
                 { data: 'product_name', name: 'name' },
+                { data: 'status', name: 'status',
+                    render: function(data, type, row) {
+                        if (data === 'Rejected') {
+                            return '<span class="text-danger">' + data + '</span>';
+                        } else if (data === 'Approved') {
+                            return '<span class="text-success">' + data + '</span>';
+                        } else if (data === 'In Approval'){
+                            return '<span class="text-primary">' + data + '</span>';
+                        }
+                        return data;
+                    }
+                },
                 { data: null, name: 'action', orderable: false, searchable: false, 
                     render: function(data, type, row) {
                         const route = "{{ route('mpdr.form', ':formId') }}";
