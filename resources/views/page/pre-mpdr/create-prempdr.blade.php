@@ -44,7 +44,7 @@
     </div>
 
     <div id="content" class="w-100">
-        <form id="form" action="{{ route('prempdr.store') }}" method="POST">
+        <form id="form" class="" action="{{ route('prempdr.store') }}" method="POST">
             @csrf
             <main id="prempdr-main" class="d-flex flex-column gap-3 p-2">
                 <div class="d-flex justify-content-end">
@@ -334,7 +334,6 @@
             </footer>
 
             <div class="w-100 d-flex align-items-center justify-content-center mb-5">
-                <input type="hidden" name="form_status" id="form_status" value="">
                 <button type="submit" name="form_status" value="Draft" class="btn btn-primary me-3">Save as Draft</button>
                 <button type="submit" name="form_status" value="Submit" class="btn btn-success">Submit</button>
             </div>
@@ -357,26 +356,6 @@
             searching: false,
             info: false 
         });
-
-        function submitForm(value) {
-            // SweetAlert2 confirmation dialog for submit action
-            const input = document.getElementById('form_status')
-            input.value = value;
-            Swal.fire({
-                title: "Form " + value,
-                text: "Are you sure you want to " + value + "?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#26D639',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes!',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $("#form").submit();
-                }
-            });
-        }
 
         document.addEventListener('DOMContentLoaded', function() {
             // Mengambil no_reg yang baru

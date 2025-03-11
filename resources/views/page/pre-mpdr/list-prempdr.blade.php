@@ -83,7 +83,7 @@
                         } else if (data === 'Approved') {
                             return '<span class="text-success">' + data + '</span>';
                         } else if (data === 'In Approval'){
-                            return '<span class="text-primary">' + data + '</span>';
+                            return `<span class="text-primary"> ${data}  (${row.approved_detail[0].approved_count}/${row.approved_detail[0].total}) </span>`;
                         }else if (data === 'Draft'){
                             return '<span class="text-body-secondary">' + data + '</span>';
                         }
@@ -94,7 +94,7 @@
                 { data: null, name: 'action', orderable: false, searchable: false, 
                     render: function(data, type, row) {
                         if (data.status === 'Draft') {
-                            const editRoute = "{{ route('prempdr.draft.form', ':formId') }}".replace(':formId', row.no);
+                            const editRoute = "{{ route('prempdr.edit', ':formId') }}".replace(':formId', row.no);
                             const deleteRoute = "{{ route('prempdr.destroy', ':formId') }}".replace(':formId', row.no);
 
                             return `

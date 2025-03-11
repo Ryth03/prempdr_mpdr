@@ -177,7 +177,7 @@
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certification" id="certification2" value="Halal">
+                            <input class="form-check-input" type="radio" name="certification" id="certification2" value="HALAL">
                             <label class="form-check-label" for="certification2">
                             HALAL
                             </label>
@@ -227,7 +227,7 @@
                         <li>
                             <div class="">
                                 <label for="weightProduct" class="form-label">Weight of Product (kg/carton):</label>
-                                <input type="number" class="form-control" name="weightProduct" required> 
+                                <input type="number" class="form-control" name="weightProduct" id="weightProduct" required> 
                             </div>
                         </li>
                         <li>
@@ -290,7 +290,8 @@
             </main>
 
             <div class="w-100 d-flex align-items-center justify-content-center mb-5">
-                <button type="submit" class="btn btn-success">Submit</button>
+                <button type="submit" name="form_status" value="Draft" class="btn btn-primary me-3">Save as Draft</button>
+                <button type="submit" name="form_status" value="Submit" class="btn btn-success">Submit</button>
             </div>
         </form>
     </div>

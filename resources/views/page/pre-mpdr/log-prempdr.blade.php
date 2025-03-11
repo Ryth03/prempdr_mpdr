@@ -59,6 +59,7 @@
         <script src="https://cdn.datatables.net/responsive/3.0.0/js/dataTables.responsive.js"></script>
         <script>
             $('#prempdrTable').DataTable({
+                order: [0, 'desc'],
                 processing: true,
                 serverSide: false,
                 ajax: {

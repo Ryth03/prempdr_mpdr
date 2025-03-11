@@ -97,7 +97,6 @@ Route::middleware('auth')->group(function () {
         Route::POST('/store', [PreMpdrController::class, 'store'])->name('prempdr.store');
         Route::get('/print-{no_reg}', [PreMpdrController::class, 'print'])->name('prempdr.print');
         Route::get('/form-{no_reg}', [PreMpdrController::class, 'show'])->name('prempdr.form');
-        Route::get('/draft-{no_reg}', [PreMpdrController::class, 'showDraftForm'])->name('prempdr.draft.form');
 
         Route::get('/template', [PreMpdrController::class, 'template'])->name('prempdr.template');
         Route::get('/no_reg', [PreMpdrController::class, 'noReg'])->name('prempdr.noReg');
@@ -108,7 +107,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/print-data', [PreMpdrController::class, 'getPrintData'])->name('prempdr.print.data');
 
         
-        Route::POST('/draftStore', [PreMpdrController::class, 'draftStore'])->name('prempdr.draft.update');
         Route::get('/approval-form-{no_reg}', [PreMpdrApprovalController::class, 'viewApprovalForm'])->name('prempdr.approval.form.view');
         Route::POST('/approve-form-{no_reg}', [PreMpdrApprovalController::class, 'approveForm'])->name('prempdr.form.approve');
         Route::get('/getApproverListData', [PreMpdrApprovalController::class, 'getApproverListData'])->name('prempdr.approver.list.data');
@@ -123,8 +121,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [MpdrController::class, 'index'])->name('mpdr.index');
         Route::get('/create', [MpdrController::class, 'create'])->name('mpdr.create');
         Route::get('/edit/{id}', [MpdrController::class, 'edit'])->name('mpdr.edit');
-        Route::patch('/update/{id}', [MpdrController::class, 'update'])->name('mpdr.update');
-        Route::delete('/destroy/{id}', [MpdrController::class, 'destroy'])->name('mpdr.destroy');
+        Route::patch('/update/{no_reg}', [MpdrController::class, 'update'])->name('mpdr.update');
+        Route::delete('/destroy/{no_reg}', [MpdrController::class, 'destroy'])->name('mpdr.destroy');
         Route::get('/report', [MpdrController::class, 'report'])->name('mpdr.reports');
         Route::get('/log', [MpdrController::class, 'log'])->name('mpdr.log');
         Route::POST('/store', [MpdrController::class, 'store'])->name('mpdr.store');

@@ -178,7 +178,7 @@ class PreMpdrController extends Controller
 
             activity()
             ->performedOn($form)
-            ->inLog('prempdr')
+            ->inLog('mpdr')
             ->event('Create')
             ->causedBy($user)
             ->withProperties(['no' => $validated['no_reg'], 'action' => 'created'])
@@ -209,143 +209,17 @@ class PreMpdrController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $no_reg)
     {
-        return view('page.pre-mpdr.edit-prempdr');
-
+        confirmDelete();
+        return view('page.pre-mpdr.edit-prempdr')->with('no_reg', $no_reg);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $no_reg)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $no)
-    {
-        $user = Auth::user();
-        DB::beginTransaction();
-
-        try {
-            $form = PrempdrForm::where('no', $no)->first();
-            $form->delete();
-            DB::commit();
-
-            activity()
-            ->performedOn($form)
-            ->inLog('prempdr')
-            ->event('Delete')
-            ->causedBy($user)
-            ->withProperties(['no' => $no, 'action' => 'deleted'])
-            ->log('Delete PreMpdr Form ' . $no . ' by ' . $user->name . ' at ' . now());
-
-            Alert::toast('Form successfully deleted!.', 'success');
-            return redirect()->route('prempdr.index');
-        } catch (\Exception $e) {
-            // Rollback transaksi jika terjadi kesalahan
-            DB::rollback();
-            Alert::toast('There was an error updating the form.'.$e->getMessage(), 'error');
-            return back();
-        }
-    }
-
-    public function report()
-    {
-        return view('page.pre-mpdr.report-prempdr');
-    }
-
-    public function approval()
-    {
-        return view('page.pre-mpdr.approval-prempdr');
-    }
-
-    public function log()
-    {
-        return view('page.pre-mpdr.log-prempdr');
-    }
-    
-    public function print($no_reg)
-    {
-        return view('page.pre-mpdr.print-prempdr')->with('no_reg', $no_reg);
-    }
-    
-    public function noReg()
-    {
-        $year = date('y');
-        $prefix = "{$year}PREMPDR";
-        $lastPcr = PreMpdrForm::where('no', 'like', "{$prefix}%")->orderBy('no', 'desc')->first();
-
-        if ($lastPcr) {
-            $lastNo = (int)substr($lastPcr->no_reg, -4);
-            $newNo = $lastNo + 1;
-        } else {
-            $newNo = 1;
-        }
-
-        do {
-            $newNoReg = $prefix . str_pad($newNo, 4, '0', STR_PAD_LEFT);
-            $existingPcr = PreMpdrForm::where('no', $newNoReg)->first();
-            if ($existingPcr) {
-                $newNo++;
-            }
-        } while ($existingPcr);
-
-        return response()->json(['no_reg' => $newNoReg]);
-    }
-
-    public function getPrintData(Request $request)
-    {
-        $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver')->where('no', $request->input('id'))->first();
-        if($form){
-            return response()->json($form);
-        }
-
-        return response()->json("Tidak ada Form");
-    }
-
-    public function getFormData(Request $request)
-    {
-        $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver', 'approvedDetail')->where('no', $request->input('no_reg'))->first();
-        if($form){
-            return response()->json($form);
-        }
-
-        return response()->json("Tidak ada Form");
-    }
-
-    public function getReportData()
-    {
-        $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver', 'approvedDetail')->where('user_id', Auth::user()->id)->get();
-        if($form){
-            $form = $form->map(function($item) {
-                /** @var PreMpdrForm $item */
-                $item->new_created_at = $item->created_at->format('j F Y');
-                return $item;
-            });
-            return response()->json($form);
-        }
-
-        return response()->json("Tidak ada Form");
-    }
-
-    public function template()
-    {
-        return view('page.pre-mpdr.template-form-prempdr');
-    }
-
-    public function showDraftForm($no_reg){
-        confirmDelete();
-        return view('page.pre-mpdr.draft-prempdr')->with('no_reg', $no_reg);
-    }
-
-    public function draftStore(Request $request)
-    {
-        // dd($request, $request->productCategory);
         $validated = $request->validate([
             'form_status' => 'required|string|in:Draft,Submit',
             'no_reg' => 'required|string',
@@ -499,9 +373,135 @@ class PreMpdrController extends Controller
         }
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $no)
+    {
+        $user = Auth::user();
+        DB::beginTransaction();
+
+        try {
+            $form = PrempdrForm::where('no', $no)
+                    ->where('status', 'Draft')
+                    ->first();
+            $form->delete();
+            DB::commit();
+
+            activity()
+            ->performedOn($form)
+            ->inLog('prempdr')
+            ->event('Delete')
+            ->causedBy($user)
+            ->withProperties(['no' => $no, 'action' => 'deleted'])
+            ->log('Delete PreMpdr Form ' . $no . ' by ' . $user->name . ' at ' . now());
+
+            Alert::toast('Form successfully deleted!.', 'success');
+            return redirect()->route('prempdr.index');
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollback();
+            Alert::toast('There was an error updating the form.'.$e->getMessage(), 'error');
+            return back();
+        }
+    }
+
+    public function report()
+    {
+        return view('page.pre-mpdr.report-prempdr');
+    }
+
+    public function approval()
+    {
+        return view('page.pre-mpdr.approval-prempdr');
+    }
+
+    public function log()
+    {
+        return view('page.pre-mpdr.log-prempdr');
+    }
+    
+    public function print($no_reg)
+    {
+        return view('page.pre-mpdr.print-prempdr')->with('no_reg', $no_reg);
+    }
+    
+    public function noReg()
+    {
+        $year = date('y');
+        $prefix = "{$year}PREMPDR";
+        $lastPcr = PreMpdrForm::where('no', 'like', "{$prefix}%")->orderBy('no', 'desc')->first();
+
+        if ($lastPcr) {
+            $lastNo = (int)substr($lastPcr->no_reg, -4);
+            $newNo = $lastNo + 1;
+        } else {
+            $newNo = 1;
+        }
+
+        do {
+            $newNoReg = $prefix . str_pad($newNo, 4, '0', STR_PAD_LEFT);
+            $existingPcr = PreMpdrForm::where('no', $newNoReg)->first();
+            if ($existingPcr) {
+                $newNo++;
+            }
+        } while ($existingPcr);
+
+        return response()->json(['no_reg' => $newNoReg]);
+    }
+
+    public function getPrintData(Request $request)
+    {
+        $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver')->where('no', $request->input('id'))->first();
+        if($form){
+            return response()->json($form);
+        }
+
+        return response()->json("Tidak ada Form");
+    }
+
+    public function getFormData(Request $request)
+    {
+        $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver', 'approvedDetail')->where('no', $request->input('no_reg'))->first();
+        if($form){
+            return response()->json($form);
+        }
+
+        return response()->json("Tidak ada Form");
+    }
+
+    public function getReportData()
+    {
+        $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver', 'approvedDetail')->where('user_id', Auth::user()->id)->get();
+        if($form){
+            $form = $form->map(function($item) {
+                /** @var PreMpdrForm $item */
+                $item->new_created_at = $item->created_at->format('j F Y');
+                return $item;
+            });
+            return response()->json($form);
+        }
+
+        return response()->json("Tidak ada Form");
+    }
+
+    public function template()
+    {
+        return view('page.pre-mpdr.template-form-prempdr');
+    }
+
+    public function showDraftForm($no_reg){
+        confirmDelete();
+        return view('page.pre-mpdr.draft-prempdr')->with('no_reg', $no_reg);
+    }
+
     public function getFormList()
     {
-        $forms = PreMpdrForm::where('user_id', Auth::user()->id)->get();
+        $forms = PreMpdrForm::where('user_id', Auth::user()->id)
+        ->with(['approvedDetail' => function ($query) {
+            $query->select(DB::raw("form_id, count(*) as total, sum(case when status is not null then 1 else 0 end) as approved_count"))->groupBy('form_id');
+        }])
+        ->get();
         if($forms){
             return response()->json($forms);
         }

@@ -12,7 +12,6 @@ class LogController extends Controller
 {
     public function getLogsData(Request $request){
         $logs = Activity::where('log_name', $request->input('form'))
-        ->orderBy('created_at', 'desc')
         ->get();
         if($logs){
             return response()->json($logs);

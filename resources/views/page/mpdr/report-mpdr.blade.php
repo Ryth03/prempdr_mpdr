@@ -261,7 +261,7 @@
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="certification" id="certification3">
+                                            <input class="form-check-input" type="radio" name="certification" id="certificationOthers">
                                             <label class="form-check-label" for="certification3">
                                                 Others
                                             </label>
@@ -527,7 +527,8 @@
                 $('#storageTemperature').val(form.description.storage_temperature);
                 $('#deliveryTemperature').val(form.description.delivery_temperature);
                 
-                $(`#${form.certification.category}`).prop('checked', true).prop('disabled', false);
+                var category = form.certification.category === 'Others' ? 'certificationOthers' : form.certification.category;
+                $(`#${category}`).prop('checked', true).prop('disabled', false);
                 $('#certificationText').val(form.certification.other);
 
                 // Competitor's Product
@@ -567,7 +568,7 @@
                         }else if(detail.status === 'approve with review'){
                             approvedWithReviewCell = newDiv;
                             commentsCell = detail.comment;
-                        }else{
+                        }else if(detail.status === 'not approve'){
                             notApprovedCell = newDiv;
                             commentsCell = detail.comment;
                         }

@@ -25,38 +25,53 @@ class PreMpdrApprovalController extends Controller
 
     public function approveForm(Request $request, $no_reg)
     {
-        
+        $validated = $request->validate([
+            'action' => 'required|string|in:approve,approve with review,not approve',
+        ]);
         DB::beginTransaction();
         try {
-            $nik = Auth::user()->nik;
+            $user = Auth::user();
+            $nik = $user->nik;
             $form = PreMpdrForm::with('approvedDetail')->where('no', $no_reg)->first();
             
             foreach($form->approvedDetail as $detail){
                 if($detail->approver === $nik){
-                    $detail->status = $request->input('action');
+                    $detail->status = $validated['action'];
                     $detail->approved_date = now();
-                    if($request->input('action') !== 'approve'){
+                    if($validated['action'] !== 'approve'){
                         $detail->comment = $request->input('comment');
                     }
                     $detail->save();
                     break;
                 }
             }
-            if($request->input('action') === 'approve' || $request->input('action') === 'approve with review'){
+            if($validated['action'] === 'approve' || $validated['action'] === 'approve with review'){
                 $notNull = True;
                 foreach($form->approvedDetail as $detail){
                     if(!$detail->status){
                         $notNull = False;
+                        $form->route_to = $detail->name;
                         break;
                     }
                 }
                 if($notNull){
                     $form->status = 'Approved';
+                    $form->route_to = null;
                 }
             }else{
                 $form->status = 'Rejected';
+                $form->route_to = null;
             }
             $form->save();
+
+            activity()
+            ->performedOn($form)
+            ->inLog('prempdr')
+            ->event(ucfirst($validated['action']))
+            ->causedBy($user)
+            ->withProperties(['no' => $no_reg, 'action' => $validated['action']])
+            ->log(ucfirst($validated['action']) . ' PreMpdr Form ' . $no_reg . ' by ' . $user->name . ' at ' . now());
+
             DB::commit();
             Alert::toast('Form successfully ' . $request->input('action') . '!', 'success');
             return redirect()->route('prempdr.approval');

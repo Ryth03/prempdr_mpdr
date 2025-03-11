@@ -404,7 +404,7 @@
                     $('#rationalForDevelopment').text(response.detail.rational_for_development);
                     $('#targetLaunch').val(response.detail.target_launch);
 
-                    $(`#${response.category.category}`).attr('checked', true).attr('disabled', false);
+                    $(`[id="${response.category.category}"]`).attr('checked', true).attr('disabled', false);
                     $('#productCategoryText').val(response.category.other);
 
                     $(`#${response.channel.category}`).attr('checked', true).attr('disabled', false);
@@ -437,17 +437,11 @@
                     $('#expectedMargin').val(response.market.expected_margin);
                     $('#priceEstimate').val(response.market.price_estimate);
                     
+                
+                    var approvers = ["#initiator", "#salesManager", "#marketingManager", "#deptHead"];
                     var divId;
                     response.approved_detail.forEach(function(detail, index) {
-                        if(detail.approver == response.approver.initiator){
-                            divId = '#initiator';
-                        }else if(detail.approver == response.approver.sales_manager){
-                            divId = '#salesManager';
-                        }else if(detail.approver == response.approver.marketing_manager){
-                            divId = '#marketingManager';
-                        }else if(detail.approver == response.approver.department_head){
-                            divId = '#deptHead';
-                        }
+                        divId = approvers[index];
                         
                         newDiv = '';
                         if (detail.status){

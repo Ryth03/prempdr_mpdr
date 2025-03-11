@@ -196,7 +196,7 @@
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="certification" id="certification3">
+                        <input class="form-check-input" type="radio" name="certification" id="certificationOthers">
                         <label class="form-check-label" for="certification3">
                             Others
                         </label>
@@ -441,7 +441,7 @@
                     $('#rationalForDevelopment').text(response.detail.rational_for_development);
                     $('#targetLaunch').val(response.detail.target_launch);
 
-                    $(`#${response.category.category}`).attr('checked', true).attr('disabled', false);
+                    $(`[id="${response.category.category}"]`).attr('checked', true).attr('disabled', false);
                     $('#productCategoryText').val(response.category.other);
 
                     $(`#${response.channel.category}`).attr('checked', true).attr('disabled', false);
@@ -452,7 +452,8 @@
                     $('#storageTemperature').val(response.description.storage_temperature);
                     $('#deliveryTemperature').val(response.description.delivery_temperature);
                     
-                    $(`#${response.certification.category}`).attr('checked', true).attr('disabled', false);
+                    var category = response.certification.category === 'Others' ? 'certificationOthers' : response.certification.category;
+                    $(`#${category}`).prop('checked', true).prop('disabled', false);
                     $('#certificationText').val(response.certification.other);
 
                     // Competitor's Product
@@ -492,7 +493,7 @@
                             }else if(detail.status === 'approve with review'){
                                 approvedWithReviewCell = newDiv;
                                 commentsCell = detail.comment;
-                            }else{
+                            }else if(detail.status === 'not approve'){
                                 notApprovedCell = newDiv;
                                 commentsCell = detail.comment;
                             }

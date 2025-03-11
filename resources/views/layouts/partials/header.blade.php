@@ -213,7 +213,7 @@
             aria-labelledby="offcanvasWithBothOptionsLabel">
             <nav class="sidebar-nav scroll-sidebar">
                 <div class="offcanvas-header justify-content-between">
-                    <img src="../assets/images/logos/favicon.ico" alt="modernize-img" class="img-fluid">
+                    <img src="{{asset('assets/images/logos/favicon.ico')}}" alt="modernize-img" class="img-fluid">
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
                         aria-label="Close"></button>
                 </div>
@@ -231,7 +231,7 @@
                                     <a href="app-chat.html" class="d-flex align-items-center">
                                         <div
                                             class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                            <img src="../assets/images/svgs/icon-dd-chat.svg" alt="modernize-img"
+                                            <img src="{{asset('assets/images/svgs/icon-dd-chat.svg')}}" alt="modernize-img"
                                                 class="img-fluid" width="24" height="24">
                                         </div>
                                         <div>
@@ -244,7 +244,7 @@
                                     <a href="app-invoice.html" class="d-flex align-items-center">
                                         <div
                                             class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                            <img src="../assets/images/svgs/icon-dd-invoice.svg" alt="modernize-img"
+                                            <img src="{{asset('assets/images/svgs/icon-dd-invoice.svg')}}" alt="modernize-img"
                                                 class="img-fluid" width="24" height="24">
                                         </div>
                                         <div>
@@ -257,7 +257,7 @@
                                     <a href="../main/app-cotact.html" class="d-flex align-items-center">
                                         <div
                                             class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                            <img src="../assets/images/svgs/icon-dd-mobile.svg" alt="modernize-img"
+                                            <img src="{{asset('assets/images/svgs/icon-dd-mobile.svg')}}" alt="modernize-img"
                                                 class="img-fluid" width="24" height="24">
                                         </div>
                                         <div>
@@ -270,7 +270,7 @@
                                     <a href="app-email.html" class="d-flex align-items-center">
                                         <div
                                             class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                            <img src="../assets/images/svgs/icon-dd-message-box.svg"
+                                            <img src="{{asset('assets/images/svgs/icon-dd-message-box.svg')}}"
                                                 alt="modernize-img" class="img-fluid" width="24" height="24">
                                         </div>
                                         <div>
@@ -283,7 +283,7 @@
                                     <a href="page-user-profile.html" class="d-flex align-items-center">
                                         <div
                                             class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                            <img src="../assets/images/svgs/icon-dd-cart.svg" alt="modernize-img"
+                                            <img src="{{asset('assets/images/svgs/icon-dd-cart.svg')}}" alt="modernize-img"
                                                 class="img-fluid" width="24" height="24">
                                         </div>
                                         <div>
@@ -296,7 +296,7 @@
                                     <a href="app-calendar.html" class="d-flex align-items-center">
                                         <div
                                             class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                            <img src="../assets/images/svgs/icon-dd-date.svg" alt="modernize-img"
+                                            <img src="{{asset('assets/images/svgs/icon-dd-date.svg')}}" alt="modernize-img"
                                                 class="img-fluid" width="24" height="24">
                                         </div>
                                         <div>
@@ -309,7 +309,7 @@
                                     <a href="app-contact2.html" class="d-flex align-items-center">
                                         <div
                                             class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                            <img src="../assets/images/svgs/icon-dd-lifebuoy.svg" alt="modernize-img"
+                                            <img src="{{asset('assets/images/svgs/icon-dd-lifebuoy.svg')}}" alt="modernize-img"
                                                 class="img-fluid" width="24" height="24">
                                         </div>
                                         <div>
@@ -322,7 +322,7 @@
                                     <a href="app-notes.html" class="d-flex align-items-center">
                                         <div
                                             class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                            <img src="../assets/images/svgs/icon-dd-application.svg"
+                                            <img src="{{asset('assets/images/svgs/icon-dd-application.svg')}}"
                                                 alt="modernize-img" class="img-fluid" width="24" height="24">
                                         </div>
                                         <div>
@@ -404,9 +404,9 @@
                 </li>
                 <li class="nav-item d-none d-xl-block">
                     <a href="index.html" class="text-nowrap nav-link">
-                        <img src="../assets/images/logos/dark-logo.svg" class="dark-logo" width="180"
+                        <img src="{{asset('assets/images/logos/dark-logo.svg')}}" class="dark-logo" width="180"
                             alt="modernize-img">
-                        <img src="../assets/images/logos/light-logo.svg" class="light-logo" width="180"
+                        <img src="{{asset('assets/images/logos/light-logo.svg')}}" class="light-logo" width="180"
                             alt="modernize-img">
                     </a>
                 </li>
@@ -440,7 +440,7 @@
                                                             class="d-flex align-items-center pb-9 position-relative">
                                                             <div
                                                                 class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                <img src="../assets/images/svgs/icon-dd-chat.svg"
+                                                                <img src="{{asset('assets/images/svgs/icon-dd-chat.svg')}}"
                                                                     alt="modernize-img" class="img-fluid"
                                                                     width="24" height="24">
                                                             </div>
@@ -456,7 +456,7 @@
                                                             class="d-flex align-items-center pb-9 position-relative">
                                                             <div
                                                                 class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                <img src="../assets/images/svgs/icon-dd-invoice.svg"
+                                                                <img src="{{asset('assets/images/svgs/icon-dd-invoice.svg')}}"
                                                                     alt="modernize-img" class="img-fluid"
                                                                     width="24" height="24">
                                                             </div>
@@ -470,7 +470,7 @@
                                                             class="d-flex align-items-center pb-9 position-relative">
                                                             <div
                                                                 class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                <img src="../assets/images/svgs/icon-dd-mobile.svg"
+                                                                <img src="{{asset('assets/images/svgs/icon-dd-mobile.svg')}}"
                                                                     alt="modernize-img" class="img-fluid"
                                                                     width="24" height="24">
                                                             </div>
@@ -486,7 +486,7 @@
                                                             class="d-flex align-items-center pb-9 position-relative">
                                                             <div
                                                                 class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                <img src="../assets/images/svgs/icon-dd-message-box.svg"
+                                                                <img src="{{asset('assets/images/svgs/icon-dd-message-box.svg')}}"
                                                                     alt="modernize-img" class="img-fluid"
                                                                     width="24" height="24">
                                                             </div>
@@ -504,7 +504,7 @@
                                                             class="d-flex align-items-center pb-9 position-relative">
                                                             <div
                                                                 class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                <img src="../assets/images/svgs/icon-dd-cart.svg"
+                                                                <img src="{{asset('assets/images/svgs/icon-dd-cart.svg')}}"
                                                                     alt="modernize-img" class="img-fluid"
                                                                     width="24" height="24">
                                                             </div>
@@ -520,7 +520,7 @@
                                                             class="d-flex align-items-center pb-9 position-relative">
                                                             <div
                                                                 class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                <img src="../assets/images/svgs/icon-dd-date.svg"
+                                                                <img src="{{asset('assets/images/svgs/icon-dd-date.svg')}}"
                                                                     alt="modernize-img" class="img-fluid"
                                                                     width="24" height="24">
                                                             </div>
@@ -536,7 +536,7 @@
                                                             class="d-flex align-items-center pb-9 position-relative">
                                                             <div
                                                                 class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                <img src="../assets/images/svgs/icon-dd-lifebuoy.svg"
+                                                                <img src="{{asset('assets/images/svgs/icon-dd-lifebuoy.svg')}}"
                                                                     alt="modernize-img" class="img-fluid"
                                                                     width="24" height="24">
                                                             </div>
@@ -552,7 +552,7 @@
                                                             class="d-flex align-items-center pb-9 position-relative">
                                                             <div
                                                                 class="text-bg-light rounded-1 me-3 p-6 d-flex align-items-center justify-content-center">
-                                                                <img src="../assets/images/svgs/icon-dd-application.svg"
+                                                                <img src="{{asset('assets/images/svgs/icon-dd-application.svg')}}"
                                                                     alt="modernize-img" class="img-fluid"
                                                                     width="24" height="24">
                                                             </div>
@@ -638,7 +638,7 @@
             </ul>
             <div class="d-block d-xl-none">
                 <a href="index.html" class="text-nowrap nav-link">
-                    <img src="../assets/images/logos/dark-logo.svg" width="180" alt="modernize-img">
+                    <img src="{{asset('assets/images/logos/dark-logo.svg')}}" width="180" alt="modernize-img">
                 </a>
             </div>
             <a class="navbar-toggler nav-icon-hover-bg rounded-circle p-0 mx-0 border-0" href="javascript:void(0)"
@@ -670,7 +670,7 @@
                         </li>
                         <li class="nav-item nav-icon-hover-bg rounded-circle dropdown">
                             <a class="nav-link" href="javascript:void(0)" id="drop2" aria-expanded="false">
-                                <img src="../assets/images/svgs/icon-flag-en.svg" alt="modernize-img" width="20px"
+                                <img src="{{asset('assets/images/svgs/icon-flag-en.svg')}}" alt="modernize-img" width="20px"
                                     height="20px" class="rounded-circle object-fit-cover round-20">
                             </a>
                             <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up"
@@ -679,7 +679,7 @@
                                     <a href="javascript:void(0)"
                                         class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                         <div class="position-relative">
-                                            <img src="../assets/images/svgs/icon-flag-en.svg" alt="modernize-img"
+                                            <img src="{{asset('assets/images/svgs/icon-flag-en.svg')}}" alt="modernize-img"
                                                 width="20px" height="20px"
                                                 class="rounded-circle object-fit-cover round-20">
                                         </div>
@@ -688,7 +688,7 @@
                                     <a href="javascript:void(0)"
                                         class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                         <div class="position-relative">
-                                            <img src="../assets/images/svgs/icon-flag-cn.svg" alt="modernize-img"
+                                            <img src="{{asset('assets/images/svgs/icon-flag-cn.svg')}}" alt="modernize-img"
                                                 width="20px" height="20px"
                                                 class="rounded-circle object-fit-cover round-20">
                                         </div>
@@ -697,7 +697,7 @@
                                     <a href="javascript:void(0)"
                                         class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                         <div class="position-relative">
-                                            <img src="../assets/images/svgs/icon-flag-fr.svg" alt="modernize-img"
+                                            <img src="{{asset('assets/images/svgs/icon-flag-fr.svg')}}" alt="modernize-img"
                                                 width="20px" height="20px"
                                                 class="rounded-circle object-fit-cover round-20">
                                         </div>
@@ -706,7 +706,7 @@
                                     <a href="javascript:void(0)"
                                         class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item">
                                         <div class="position-relative">
-                                            <img src="../assets/images/svgs/icon-flag-sa.svg" alt="modernize-img"
+                                            <img src="{{asset('assets/images/svgs/icon-flag-sa.svg')}}" alt="modernize-img"
                                                 width="20px" height="20px"
                                                 class="rounded-circle object-fit-cover round-20">
                                         </div>
@@ -753,7 +753,7 @@
                                     <a href="javascript:void(0)"
                                         class="py-6 px-7 d-flex align-items-center dropdown-item">
                                         <span class="me-3">
-                                            <img src="../assets/images/profile/user-2.jpg" alt="user"
+                                            <img src="{{asset('assets/images/profile/user-2.jpg')}}" alt="user"
                                                 class="rounded-circle" width="48" height="48">
                                         </span>
                                         <div class="w-100">
@@ -764,7 +764,7 @@
                                     <a href="javascript:void(0)"
                                         class="py-6 px-7 d-flex align-items-center dropdown-item">
                                         <span class="me-3">
-                                            <img src="../assets/images/profile/user-3.jpg" alt="user"
+                                            <img src="{{asset('assets/images/profile/user-3.jpg')}}" alt="user"
                                                 class="rounded-circle" width="48" height="48">
                                         </span>
                                         <div class="w-100">
@@ -776,7 +776,7 @@
                                     <a href="javascript:void(0)"
                                         class="py-6 px-7 d-flex align-items-center dropdown-item">
                                         <span class="me-3">
-                                            <img src="../assets/images/profile/user-4.jpg" alt="user"
+                                            <img src="{{asset('assets/images/profile/user-4.jpg')}}" alt="user"
                                                 class="rounded-circle" width="48" height="48">
                                         </span>
                                         <div class="w-100">
@@ -787,7 +787,7 @@
                                     <a href="javascript:void(0)"
                                         class="py-6 px-7 d-flex align-items-center dropdown-item">
                                         <span class="me-3">
-                                            <img src="../assets/images/profile/user-5.jpg" alt="user"
+                                            <img src="{{asset('assets/images/profile/user-5.jpg')}}" alt="user"
                                                 class="rounded-circle" width="48" height="48">
                                         </span>
                                         <div class="w-100">
@@ -798,7 +798,7 @@
                                     <a href="javascript:void(0)"
                                         class="py-6 px-7 d-flex align-items-center dropdown-item">
                                         <span class="me-3">
-                                            <img src="../assets/images/profile/user-6.jpg" alt="user"
+                                            <img src="{{asset('assets/images/profile/user-6.jpg')}}" alt="user"
                                                 class="rounded-circle" width="48" height="48">
                                         </span>
                                         <div class="w-100">
@@ -810,7 +810,7 @@
                                     <a href="javascript:void(0)"
                                         class="py-6 px-7 d-flex align-items-center dropdown-item">
                                         <span class="me-3">
-                                            <img src="../assets/images/profile/user-7.jpg" alt="user"
+                                            <img src="{{asset('assets/images/profile/user-7.jpg')}}" alt="user"
                                                 class="rounded-circle" width="48" height="48">
                                         </span>
                                         <div class="w-100">
@@ -835,7 +835,7 @@
                             <a class="nav-link pe-0" href="javascript:void(0)" id="drop1" aria-expanded="false">
                                 <div class="d-flex align-items-center">
                                     <div class="user-profile-img">
-                                        <img src="../assets/images/profile/user-1.jpg" class="rounded-circle"
+                                        <img src="{{asset('assets/images/profile/user-1.jpg')}}" class="rounded-circle"
                                             width="35" height="35" alt="modernize-img">
                                     </div>
                                 </div>
@@ -847,7 +847,7 @@
                                         <h5 class="mb-0 fs-5 fw-semibold">User Profile</h5>
                                     </div>
                                     <div class="d-flex align-items-center py-9 mx-7 border-bottom">
-                                        <img src="../assets/images/profile/user-1.jpg" class="rounded-circle"
+                                        <img src="{{asset('assets/images/profile/user-1.jpg')}}" class="rounded-circle"
                                             width="80" height="80" alt="modernize-img">
                                         <div class="ms-3">
                                             <h5 class="mb-1 fs-3">Mathew Anderson</h5>
@@ -862,7 +862,7 @@
                                             class="py-8 px-7 mt-8 d-flex align-items-center">
                                             <span
                                                 class="d-flex align-items-center justify-content-center text-bg-light rounded-1 p-6">
-                                                <img src="../assets/images/svgs/icon-account.svg" alt="modernize-img"
+                                                <img src="{{asset('assets/images/svgs/icon-account.svg')}}" alt="modernize-img"
                                                     width="24" height="24">
                                             </span>
                                             <div class="w-100 ps-3">
@@ -873,7 +873,7 @@
                                         <a href="app-email.html" class="py-8 px-7 d-flex align-items-center">
                                             <span
                                                 class="d-flex align-items-center justify-content-center text-bg-light rounded-1 p-6">
-                                                <img src="../assets/images/svgs/icon-inbox.svg" alt="modernize-img"
+                                                <img src="{{asset('assets/images/svgs/icon-inbox.svg')}}" alt="modernize-img"
                                                     width="24" height="24">
                                             </span>
                                             <div class="w-100 ps-3">
@@ -884,7 +884,7 @@
                                         <a href="app-notes.html" class="py-8 px-7 d-flex align-items-center">
                                             <span
                                                 class="d-flex align-items-center justify-content-center text-bg-light rounded-1 p-6">
-                                                <img src="../assets/images/svgs/icon-tasks.svg" alt="modernize-img"
+                                                <img src="{{asset('assets/images/svgs/icon-tasks.svg')}}" alt="modernize-img"
                                                     width="24" height="24">
                                             </span>
                                             <div class="w-100 ps-3">
