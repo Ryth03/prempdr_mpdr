@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('brand_name');
             $table->string('level_priority');
             $table->string('status');
+            $table->string('route_to');
             $table->timestamps();
             $table->foreign('revision_id')->references('id')->on('pre_mpdr_revisions')->onDelete('cascade');
         });

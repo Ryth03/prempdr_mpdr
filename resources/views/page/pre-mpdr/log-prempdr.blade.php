@@ -4,6 +4,8 @@
     @endsection
 
     @push('css')
+        <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.0/css/responsive.bootstrap.min.css">
     @endpush
 
 
@@ -40,20 +42,51 @@
             <table class="table table-striped table-bordered" id="prempdrTable">
                 <thead class="header-item">
                     <th>No</th>
-                    <th>Name</th>
+                    <th>Form</th>
                     <th>Action</th>
+                    <th>Description</th>
                 </thead>
                 <tbody>
-                    @for($i=1; $i < 3; $i++)
-                        <tr>
-                            <td>{{$i}}</td>
-                            <td>Form {{$i}}</td>
-                            <td>Edit Form... (4 October)</td>
-                        </tr>
-                    @endfor
                 </tbody>
             </table>
            </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/2.2.1/js/dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/responsive/3.0.0/js/dataTables.responsive.js"></script>
+        <script>
+            $('#prempdrTable').DataTable({
+                processing: true,
+                serverSide: false,
+                ajax: {
+                    url: '{{ route('logs.data') }}',
+                    type: 'GET',
+                    data : {
+                        form: 'prempdr'
+                    },
+                    dataSrc: function(response) {
+                        return response;
+                    }
+                },
+                columns: [
+                    { data: null, name: 'no' ,
+                        render: function(data, type, row, meta) {
+                            return meta.row +1;
+                        }
+                    },
+                    { data: null, name: 'form' ,
+                        render: function(data, type, row) {
+                            // console.log();
+                            return row.properties.no;
+                        }
+                    },
+                    { data: 'event', name: 'action'},
+                    { data: 'description', name: 'description'}
+                ]
+            });
+        </script>
+    @endpush
 </x-app-layout>

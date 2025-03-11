@@ -261,7 +261,7 @@
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="certification" id="certification3">
+                                            <input class="form-check-input" type="radio" name="certification" id="certificationOthers">
                                             <label class="form-check-label" for="certification3">
                                                 Others
                                             </label>
@@ -515,6 +515,7 @@
             function changeForm(index){
                 clearForm();
                 var form = forms[index];
+                console.log(form);
 
                 $('#title-report').text(form.project_name);
                 $('#id-report').text(form.no);
@@ -543,8 +544,9 @@
                 $('#usageDescription').val(form.description.usage_description);
                 $('#storageTemperature').val(form.description.storage_temperature);
                 $('#deliveryTemperature').val(form.description.delivery_temperature);
-                
-                $(`#${form.certification.category}`).prop('checked', true).prop('disabled', false);
+
+                var category = form.certification.category === 'Others' ? 'certificationOthers' : form.certification.category;
+                $(`#${category}`).prop('checked', true).prop('disabled', false);
                 $('#certificationText').val(form.certification.other);
 
                 // Competitor's Product
@@ -566,18 +568,10 @@
                 $('#expectedMargin').val(form.market.expected_margin);
                 $('#priceEstimate').val(form.market.price_estimate);
                 
+                var approvers = ["#initiator", "#salesManager", "#marketingManager", "#deptHead"];
                 var divId;
                 form.approved_detail.forEach(function(detail, index) {
-                    if(detail.approver == form.approver.initiator){
-                        divId = '#initiator';
-                    }else if(detail.approver == form.approver.sales_manager){
-                        divId = '#salesManager';
-                    }else if(detail.approver == form.approver.marketing_manager){
-                        divId = '#marketingManager';
-                    }else if(detail.approver == form.approver.department_head){
-                        divId = '#deptHead';
-                    }
-                    
+                    divId = approvers[index];
                     newDiv = '';
                     if (detail.status){
                         newDiv = document.createElement('div');

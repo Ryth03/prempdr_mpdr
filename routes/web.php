@@ -24,6 +24,7 @@ use App\Http\Controllers\Rs\RequistionSlipController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
+use App\Http\Controllers\Master\LogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +80,8 @@ Route::middleware('auth')->group(function () {
         return response()->json(['count' => auth()->user()->unreadNotifications->count()]);
     })->name('notifications.count');
     Route::delete('/notifications/clear', [PermissionController::class, 'clearAll'])->name('notifications.clear');
+    
+    Route::get('/getLogsData', [LogController::class, 'getLogsData'])->name('logs.data');
 
 
     // =============================================================PRE MPDR=================================================================
@@ -94,6 +97,7 @@ Route::middleware('auth')->group(function () {
         Route::POST('/store', [PreMpdrController::class, 'store'])->name('prempdr.store');
         Route::get('/print-{no_reg}', [PreMpdrController::class, 'print'])->name('prempdr.print');
         Route::get('/form-{no_reg}', [PreMpdrController::class, 'show'])->name('prempdr.form');
+        Route::get('/draft-{no_reg}', [PreMpdrController::class, 'showDraftForm'])->name('prempdr.draft.form');
 
         Route::get('/template', [PreMpdrController::class, 'template'])->name('prempdr.template');
         Route::get('/no_reg', [PreMpdrController::class, 'noReg'])->name('prempdr.noReg');
@@ -104,6 +108,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/print-data', [PreMpdrController::class, 'getPrintData'])->name('prempdr.print.data');
 
         
+        Route::POST('/draftStore', [PreMpdrController::class, 'draftStore'])->name('prempdr.draft.update');
         Route::get('/approval-form-{no_reg}', [PreMpdrApprovalController::class, 'viewApprovalForm'])->name('prempdr.approval.form.view');
         Route::POST('/approve-form-{no_reg}', [PreMpdrApprovalController::class, 'approveForm'])->name('prempdr.form.approve');
         Route::get('/getApproverListData', [PreMpdrApprovalController::class, 'getApproverListData'])->name('prempdr.approver.list.data');

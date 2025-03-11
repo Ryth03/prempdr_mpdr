@@ -394,7 +394,7 @@
 
         function submitForm(value) {
             // SweetAlert2 confirmation dialog for submit action
-            const input = document.getElementById('action')
+            const input = document.getElementById('action');
             input.value = value;
             Swal.fire({
                 title: "Form " + value,

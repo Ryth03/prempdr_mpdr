@@ -48,6 +48,7 @@
                     <th>No</th>
                     <th>Name</th>
                     <th>Status</th>
+                    <th>Route To</th>
                     <th>Action</th>
                 </thead>
                 <tbody>
@@ -83,19 +84,60 @@
                             return '<span class="text-success">' + data + '</span>';
                         } else if (data === 'In Approval'){
                             return '<span class="text-primary">' + data + '</span>';
+                        }else if (data === 'Draft'){
+                            return '<span class="text-body-secondary">' + data + '</span>';
                         }
                         // return data;
                     }
                 },
+                { data: 'route_to', name: 'route_to' },
                 { data: null, name: 'action', orderable: false, searchable: false, 
                     render: function(data, type, row) {
-                        const route = "{{ route('prempdr.form', ':formId') }}";
-                        const url = route.replace(':formId', row.no);
-                        return `<a href="${url}" class="btn btn-outline-primary" >View Form</a>`;
+                        if (data.status === 'Draft') {
+                            const editRoute = "{{ route('prempdr.draft.form', ':formId') }}".replace(':formId', row.no);
+                            const deleteRoute = "{{ route('prempdr.destroy', ':formId') }}".replace(':formId', row.no);
+
+                            return `
+                            <div class="d-flex gap-6">
+                                <a href="${editRoute}" class="btn btn-outline-primary" >Edit Form</a>
+                                <form id="delete-form-${row.no}" action="${deleteRoute}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <a href="javascript:void(0)" class="btn btn-outline-danger" data-form-no="${row.no}" onClick="confirmDelete(this)">
+                                        <i class="ti ti-trash"></i>
+                                    </a>
+                                </form>
+                            </div>
+                            `;
+                        } else {
+                            const route = "{{ route('prempdr.form', ':formId') }}";
+                            const url = route.replace(':formId', row.no);
+                            return `<a href="${url}" class="btn btn-outline-primary" >View Form</a>`;
+                        }
                     }
                 }
             ]
         });
+
+        // Function untuk konfirmasi delete user
+        function confirmDelete(button){
+            var formNo = button.getAttribute('data-form-no');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + formNo).submit();
+                }
+            });
+        }
     </script>
     @endpush
 

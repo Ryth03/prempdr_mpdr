@@ -1,14 +1,26 @@
 <x-app-layout>
     @section('title')
-        Create PREMPDR
+        Form Draft PREMPDR
     @endsection
-
 
     @push('css')
         <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.dataTables.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
         <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.0/css/responsive.bootstrap.min.css">
         <style>
+            @media print {
+                
+                body {
+                    zoom: 0.6; 
+                    margin: 0px;
+                }
+                .no-print, .topbar, .left-sidebar{
+                    display: none !important;
+                }
+                
+            }
+            #competitorProduct>tbody>tr>th, #competitorProduct>tbody>tr>td, #approver>tbody>tr>th, #approver>tbody>tr>td{
+                padding: 8px 10px !important;
+            }
             .no-resize{
                 resize:none;
             }
@@ -20,13 +32,13 @@
         <div class="card-body px-4 py-3">
             <div class="row align-items-center">
                 <div class="col-9">
-                    <h4 class="fw-semibold mb-8">Create PREMPDR</h4>
+                    <h4 class="fw-semibold mb-8">Form Draft PREMPDR</h4>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
                                 <a class="text-muted text-decoration-none" href="{{ route('dashboard') }}">Home</a>
                             </li>
-                            <li class="breadcrumb-item" aria-current="page">Create PREMPDR</li>
+                            <li class="breadcrumb-item" aria-current="page">Form Draft PREMPDR</li>
                         </ol>
                     </nav>
                 </div>
@@ -43,8 +55,9 @@
         </div>
     </div>
 
+    
     <div id="content" class="w-100">
-        <form id="form" action="{{ route('prempdr.store') }}" method="POST">
+        <form id="form" action="{{ route('prempdr.draft.update') }}" method="POST">
             @csrf
             <main id="prempdr-main" class="d-flex flex-column gap-3 p-2">
                 <div class="d-flex justify-content-end">
@@ -54,11 +67,11 @@
                 <div class="row">
                     <div class="col-12 col-md-5">
                         <label for="projectName" class="form-label">Project Name:</label>
-                        <input type="text" class="form-control" name="projectName" required> 
+                        <input type="text" class="form-control" name="projectName" id="projectName" required> 
                     </div>
                     <div class="col-12 col-md-2">
                         <label for="levelPriority" class="form-label">Level Priority:</label>
-                        <select class="form-select" name="levelPriority" required>
+                        <select class="form-select" name="levelPriority" id="levelPriority" required>
                             <option value="A">A</option>
                             <option value="B">B</option>
                             <option value="C">C</option>
@@ -66,7 +79,7 @@
                     </div>
                     <div class="col-12 col-md-5">
                         <label for="brandName" class="form-label">Proposed BRAND Name:</label>
-                        <input type="text" class="form-control" name="brandName" required> 
+                        <input type="text" class="form-control" name="brandName" id="brandName" required> 
                     </div>
                 </div>
                 <div id="rational">
@@ -78,35 +91,35 @@
                         <label class="form-label">Product Category:</label>
                         <div class="">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="productCategory" id="productCategory1" value="Margarine" required>
-                                <label class="form-check-label" for="productCategory1">
+                                <input class="form-check-input" type="radio" name="productCategory" id="Margarine" value="Margarine" required>
+                                <label class="form-check-label" for="Margarine">
                                 Margarine
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="productCategory" id="productCategory2" value="Frying Fats">
-                                <label class="form-check-label" for="productCategory2">
+                                <input class="form-check-input" type="radio" name="productCategory" id="Frying Fats" value="Frying Fats">
+                                <label class="form-check-label" for="Frying Fats">
                                 Frying Fats
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="productCategory" id="productCategory3" value="Shortening">
-                                <label class="form-check-label" for="productCategory3">
+                                <input class="form-check-input" type="radio" name="productCategory" id="Shortening" value="Shortening">
+                                <label class="form-check-label" for="Shortening">
                                 Shortening
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="productCategory" id="productCategory4" value="Pastry">
-                                <label class="form-check-label" for="productCategory4">
+                                <input class="form-check-input" type="radio" name="productCategory" id="Pastry" value="Pastry">
+                                <label class="form-check-label" for="Pastry">
                                 Pastry
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="productCategory" id="productCategory5" value="Others">
-                                <label class="form-check-label" for="productCategory5">
+                                <input class="form-check-input" type="radio" name="productCategory" id="Others" value="Others">
+                                <label class="form-check-label" for="Others">
                                     Others
                                 </label>
-                                <input type="text" class="form-control" name="productCategoryText" placeholder="(Others)">
+                                <input type="text" class="form-control" name="productCategoryText" id="productCategoryText">
                             </div>
                         </div>
                     </div>
@@ -114,33 +127,33 @@
                         <label class="form-label">Channel:</label>
                         <div class="">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="channel" id="channel1" value="International" required>
-                                <label class="form-check-label" for="channel1">
+                                <input class="form-check-input" type="radio" name="channel" id="International" value="International" required>
+                                <label class="form-check-label" for="International">
                                 International
                                 </label>
-                                <input type="text" class="form-control" name="country" placeholder="Country">
+                                <input type="text" class="form-control" name="country" id="country">
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="channel" id="channel2" value="Regional">
-                                <label class="form-check-label" for="channel2">
+                                <input class="form-check-input" type="radio" name="channel" id="Regional" value="Regional">
+                                <label class="form-check-label" for="Regional">
                                 Regional
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="channel" id="channel3" value="Industrial">
-                                <label class="form-check-label" for="channel3">
+                                <input class="form-check-input" type="radio" name="channel" id="Industrial" value="Industrial">
+                                <label class="form-check-label" for="Industrial">
                                 Industrial
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="channel" id="channel4" value="FSBC-Direct">
-                                <label class="form-check-label" for="channel4">
+                                <input class="form-check-input" type="radio" name="channel" id="FSBC-Direct" value="FSBC-Direct">
+                                <label class="form-check-label" for="FSBC-Direct">
                                 FSBC-Direct
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="channel" id="channel5" value="FSBC-Distributor">
-                                <label class="form-check-label" for="channel5">
+                                <input class="form-check-input" type="radio" name="channel" id="FSBC-Distributor" value="FSBC-Distributor">
+                                <label class="form-check-label" for="FSBC-Distributor">
                                 FSBC-Distributor
                                 </label>
                             </div>
@@ -170,23 +183,23 @@
                     <label class="form-label">Certification Requirement:</label>
                     <div class="">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certification" id="certification1" value="BPOM" required>
-                            <label class="form-check-label" for="certification1">
+                            <input class="form-check-input" type="radio" name="certification" id="BPOM" value="BPOM" required>
+                            <label class="form-check-label" for="BPOM">
                             BPOM
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certification" id="certification2" value="HALAL">
-                            <label class="form-check-label" for="certification2">
+                            <input class="form-check-input" type="radio" name="certification" id="HALAL" value="HALAL">
+                            <label class="form-check-label" for="HALAL">
                             HALAL
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certification" id="certification3" value="Others">
-                            <label class="form-check-label" for="certification3">
+                            <input class="form-check-input" type="radio" name="certification" id="certificationOthers" value="Others">
+                            <label class="form-check-label" for="Others">
                                 Others
                             </label>
-                            <input type="text" class="form-control" name="certificationText" placeholder="(Others)">
+                            <input type="text" class="form-control" id="certificationText" name="certificationText" placeholder="(Others)">
                         </div>
                     </div>
                 </div>
@@ -205,17 +218,17 @@
                         <tbody>
                             <tr>
                                 <td>1</td>
-                                <td><input type="text" class="form-control" name="productName1" id="" placeholder="Product Name"></td>
-                                <td><input type="text" class="form-control" name="size1" id=""></td>
-                                <td><input type="text" class="form-control" name="packaging1" id=""></td>
-                                <td><input type="text" class="form-control" name="priceIndication1" id=""></td>
+                                <td><input type="text" class="form-control" name="productName1" id="productName1" placeholder="Product Name"></td>
+                                <td><input type="text" class="form-control" name="size1" id="size1"></td>
+                                <td><input type="text" class="form-control" name="packaging1" id="packaging1"></td>
+                                <td><input type="text" class="form-control" name="priceIndication1" id="priceIndication1"></td>
                             </tr>
                             <tr>
                                 <td>2</td>
-                                <td><input type="text" class="form-control" name="productName2" id="" placeholder="Product Name"></td>
-                                <td><input type="text" class="form-control" name="size2" id="" ></td>
-                                <td><input type="text" class="form-control" name="packaging2" id=""></td>
-                                <td><input type="text" class="form-control" name="priceIndication2" id=""></td>
+                                <td><input type="text" class="form-control" name="productName2" id="productName2" placeholder="Product Name"></td>
+                                <td><input type="text" class="form-control" name="size2" id="size2" ></td>
+                                <td><input type="text" class="form-control" name="packaging2" id="packaging2"></td>
+                                <td><input type="text" class="form-control" name="priceIndication2" id="priceIndication2"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -226,25 +239,25 @@
                         <li>
                             <div class="">
                                 <label for="weightProduct" class="form-label">Weight of Product (kg/carton):</label>
-                                <input type="number" class="form-control" name="weightProduct" required> 
+                                <input type="number" class="form-control" name="weightProduct" id="weightProduct" required> 
                             </div>
                         </li>
                         <li>
                             <label class="form-label">Packaging:</label>
                             <div class="row">
                                 <div class="form-check col">
-                                    <input class="form-check-input" type="radio" name="packaging" id="existingPackaging" value="Existing" required>
+                                    <input class="form-check-input" type="radio" name="packaging" id="ExistingPackaging" value="Existing" required>
                                     <label class="form-check-label" for="existingPackaging">
                                     Existing
                                     </label>
-                                    <textarea class="form-control no-resize" name="ExistingPackagingText" placeholder="Details" rows="2"></textarea>
+                                    <textarea class="form-control no-resize" name="ExistingPackagingText" id="ExistingPackagingText" placeholder="Details" rows="2"></textarea>
                                 </div>
                                 <div class="form-check col">
-                                    <input class="form-check-input" type="radio" name="packaging" id="newPackaging" value="New">
+                                    <input class="form-check-input" type="radio" name="packaging" id="NewPackaging" value="New">
                                     <label class="form-check-label" for="newPackaging">
                                     New
                                     </label>
-                                    <textarea class="form-control no-resize" name="NewPackagingText" placeholder="Details" rows="2"></textarea>
+                                    <textarea class="form-control no-resize" name="NewPackagingText" id="NewPackagingText" placeholder="Details" rows="2"></textarea>
                                 </div>
                             </div>
                         </li>
@@ -252,7 +265,7 @@
                             <div>
                                 <label class="form-label">Product Variation List:</label>
                                 <div>
-                                    <input type="text" class="form-control" name="productVariation" id="" required>
+                                    <input type="text" class="form-control" name="productVariation" id="productVariation" required>
                                 </div>
                             </div>
                         </li>
@@ -264,7 +277,7 @@
                         <li>
                             <div class="form-chcek">
                                 <label for="potentialVolume" class="form-label">Potential Volume (Mt/Annually):</label>
-                                <input type="number" class="form-control" name="potentialVolume" required> 
+                                <input type="number" class="form-control" name="potentialVolume" id="potentialVolume" required> 
                             </div>
                         </li>
                         <li>
@@ -272,11 +285,11 @@
                             <div class="row">
                                 <div class="form-check col">
                                     <label for="expectedMargin" class="form-label">Expected Margin (%):</label>
-                                    <input type="text" class="form-control" name="expectedMargin" required>
+                                    <input type="text" class="form-control" name="expectedMargin" id="expectedMargin" required>
                                 </div>
                                 <div class="form-check col">
                                     <label for="priceEstimate" class="form-label">Price Estimate:</label>
-                                    <input type="text" class="form-control" name="priceEstimate" required>
+                                    <input type="text" class="form-control" name="priceEstimate" id="priceEstimate" required>
                                 </div>
                             </div>
                         </li>
@@ -284,7 +297,7 @@
                 </div>
                 <div class="">
                     <h5>TARGET LAUNCH (as Initiator request): </h5>
-                    <input type="text" class="form-control" name="targetLaunchText"  placeholder="End wk of January - ETD Shipment (for first trial 1 FCL-2 FCL)" required>
+                    <input type="text" class="form-control" name="targetLaunchText" id="targetLaunch" placeholder="End wk of January - ETD Shipment (for first trial 1 FCL-2 FCL)" required>
                 </div>
             </main>
     
@@ -301,7 +314,7 @@
                             <td>Initiator</td>
                             <td>
                                 <select id="initiator" name="initiator" class="form-select form-select-sm" required>
-                                    <option selected disabled value="">Select</option>
+                                    <option disabled value="">Select</option>
                                 </select>
                             </td>
                         </tr>
@@ -309,7 +322,7 @@
                             <td>Sales Manager</td>
                             <td>
                                 <select id="salesManager" name="salesManager" class="form-select form-select-sm" required>
-                                    <option selected disabled value="">Select</option>
+                                    <option disabled value="">Select</option>
                                 </select>
                             </td>
                         </tr>
@@ -317,7 +330,7 @@
                             <td>Marketing Manager</td>
                             <td>
                                 <select id="marketingManager" name="marketingManager" class="form-select form-select-sm" required>
-                                    <option selected disabled value="">Select</option>
+                                    <option disabled value="">Select</option>
                                 </select>
                             </td>
                         </tr>
@@ -325,7 +338,7 @@
                             <td>Sales & Marketing Dept. Head</td>
                             <td>
                                 <select id="deptHead" name="deptHead" class="form-select form-select-sm" required>
-                                    <option selected disabled value="">Select</option>
+                                    <option disabled value="">Select</option>
                                 </select>
                             </td>
                         </tr>
@@ -335,32 +348,21 @@
 
             <div class="w-100 d-flex align-items-center justify-content-center mb-5">
                 <input type="hidden" name="form_status" id="form_status" value="">
-                <button type="submit" name="form_status" value="Draft" class="btn btn-primary me-3">Save as Draft</button>
-                <button type="submit" name="form_status" value="Submit" class="btn btn-success">Submit</button>
+                <button type="submit" name="form_status" value="Draft" class="btn btn-primary me-3">Save</button>
+                <button type="button" name="form_status" value="Submit" class="btn btn-success" onclick="submitForm('Submit')">Submit</button>
             </div>
         </form>
     </div>
 
-    
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/2.2.1/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/3.0.0/js/dataTables.responsive.js"></script>
     <script>
-        // membuat table menjadi responsive
-        var table = $('#competitorProduct').DataTable({
-            responsive: true,
-            ordering: false,
-            paging: false, 
-            searching: false,
-            info: false 
-        });
-
         function submitForm(value) {
             // SweetAlert2 confirmation dialog for submit action
-            const input = document.getElementById('form_status')
+            const input = document.getElementById('form_status');
             input.value = value;
             Swal.fire({
                 title: "Form " + value,
@@ -378,19 +380,80 @@
             });
         }
 
+        // Ketika html sudah dimuat
         document.addEventListener('DOMContentLoaded', function() {
-            // Mengambil no_reg yang baru
-            fetch('{{ route('prempdr.noReg') }}')
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('no_reg_text').innerHTML = data.no_reg;
-                        document.getElementById('no_reg').value = data.no_reg;
-                    })
-                    .catch(error => {
-                        console.error('Error fetching no_reg:', error);
+
+            const no_reg = @json($no_reg);
+            var form;
+            // fetch data form
+            $.ajax({
+                url: '{{ route('prempdr.form.data') }}', // URL ke controller
+                method: 'GET',
+                data: {
+                    no_reg: no_reg
+                },
+                success: function(response) {
+                    form = response;
+                    // console.log("berhasil mengambil data", response);
+                    // No_Reg
+                    $('#no_reg_text').text(no_reg);
+                    $('#no_reg').val(no_reg);
+                    
+                    // Revision
+                    $('#revision-no').text(response.revision.no);
+                    $('#revision-count').text(response.revision.revision);
+                    $('#revision-date').text(response.revision.date);
+                    
+                    $('#projectName').val(response.project_name);
+                    $('#levelPriority').val(response.level_priority);
+                    $('#brandName').val(response.brand_name);
+
+                    $('#rationalForDevelopment').text(response.detail.rational_for_development);
+                    $('#targetLaunch').val(response.detail.target_launch);
+
+                    $(`[id="${response.category.category}"]`).attr('checked', true).attr('disabled', false);
+                    $('#productCategoryText').val(response.category.other);
+
+                    $(`#${response.channel.category}`).prop('checked', true).prop('disabled', false);
+                    $('#country').val(response.channel.country);
+
+                    $('#productDescription').text(response.description.product_description);
+                    $('#usageDescription').val(response.description.usage_description);
+                    $('#storageTemperature').val(response.description.storage_temperature);
+                    $('#deliveryTemperature').val(response.description.delivery_temperature);
+                    
+                    var category = response.certification.category === 'Others' ? 'certificationOthers' : response.certification.category;
+                    $(`#${category}`).prop('checked', true).prop('disabled', false);
+                    $('#certificationText').val(response.certification.other);
+
+                    // Competitor's Product
+                    response.competitor.forEach(function(value, index) {
+                        $(`#productName${index+1}`).val(response.competitor[index].name);
+                        $(`#size${index+1}`).val(response.competitor[index].size);
+                        $(`#packaging${index+1}`).val(response.competitor[index].packaging);
+                        $(`#priceIndication${index+1}`).val(response.competitor[index].price);
                     });
 
-            
+                    // Detailed Packaging
+                    $('#weightProduct').val(response.packaging.weight);
+                    $(`#${response.packaging.category}Packaging`).prop('checked', true).prop('disabled', false);
+                    $(`#${response.packaging.category}PackagingText`).val(response.packaging.detail);
+                    $('#productVariation').val(response.packaging.product_variation);
+
+                    
+                    $('#potentialVolume').val(response.market.potential_volume);
+                    $('#expectedMargin').val(response.market.expected_margin);
+                    $('#priceEstimate').val(response.market.price_estimate);
+                    
+                },
+                error: function() {
+                    // Jika gagal, tampilkan pesan error
+                    console.log('Error ketika mengambil data form');
+                    // $('#formData').html('<p>There was an error fetching the data.</p>');
+                }
+            });
+
+
             // mengambil list approver
             $.ajax({
                 url: '{{ route('prempdr.approver.list.data') }}',
@@ -399,19 +462,23 @@
                     response.forEach(item => {
                         $('#initiator').append($('<option>', {
                             value: item.nik, 
-                            text: item.name  
+                            text: item.name,
+                            selected: item.nik ==  form.approver.initiator ? true : false
                         }));
                         $('#salesManager').append($('<option>', {
                             value: item.nik, 
-                            text: item.name  
+                            text: item.name, 
+                            selected: item.nik ==  form.approver.sales_manager ? true : false
                         }));
                         $('#marketingManager').append($('<option>', {
                             value: item.nik,
-                            text: item.name 
+                            text: item.name,
+                            selected: item.nik ==  form.approver.marketing_manager ? true : false
                         }));
                         $('#deptHead').append($('<option>', {
                             value: item.nik, 
-                            text: item.name  
+                            text: item.name,
+                            selected: item.nik ==  form.approver.department_head ? true : false
                         }));
                     });
                 },
@@ -424,4 +491,5 @@
         });
     </script>
 @endpush
+
 </x-app-layout>

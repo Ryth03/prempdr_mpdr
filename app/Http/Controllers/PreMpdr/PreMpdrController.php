@@ -20,7 +20,7 @@ class PreMpdrController extends Controller
      */
     public function index()
     {
-        // dd(Auth::user()->id);
+        confirmDelete();
         return view('page.pre-mpdr.list-prempdr');
     }
 
@@ -29,8 +29,8 @@ class PreMpdrController extends Controller
      */
     public function create()
     {
+        // confirmDelete();
         return view('page.pre-mpdr.create-prempdr');
-
     }
 
     /**
@@ -40,6 +40,7 @@ class PreMpdrController extends Controller
     {
         // dd($request, Auth::user()->id);
         $validated = $request->validate([
+            'form_status' => 'required|string|in:Draft,Submit',
             'no_reg' => 'required|string',
             'projectName' => 'required|string|max:255',
             'levelPriority' => 'required',
@@ -83,15 +84,16 @@ class PreMpdrController extends Controller
 
         try {
             $revision = PreMpdrRevision::latest()->first();
-            
+            $user = Auth::user();
             $form = PreMpdrForm::create([
                 'no' => $validated['no_reg'],
-                'user_id' => Auth::user()->id,
+                'user_id' => $user->id,
                 'revision_id' => $revision->id,
                 'project_name' => $validated['projectName'],
                 'brand_name' => $validated['brandName'],
                 'level_priority' => $validated['levelPriority'],
-                'status' => 'In Approval'
+                'status' => $validated['form_status'] == 'Submit' ? 'In Approval' : $validated['form_status'],
+                'route_to' => $validated['form_status'] == 'Submit' ? User::where('nik', $validated['initiator'])->first()->name : null
             ]);
 
             // Simpan FormDetail terkait dengan Form
@@ -174,9 +176,17 @@ class PreMpdrController extends Controller
                 ]);
             }
 
+            activity()
+            ->performedOn($form)
+            ->inLog('prempdr')
+            ->event('Create')
+            ->causedBy($user)
+            ->withProperties(['no' => $validated['no_reg'], 'action' => 'created'])
+            ->log('Create PreMpdr Form ' . $validated['no_reg'] . ' by ' . $user->name . ' at ' . now());
+
             // Commit transaksi
             DB::commit();
-            Alert::toast('Form and details saved successfully!', 'success');
+            Alert::toast('Form and details successfully saved!', 'success');
             return redirect()->route('prempdr.index');
             
         } catch (\Exception $e) {
@@ -216,9 +226,32 @@ class PreMpdrController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $no)
     {
-        //
+        $user = Auth::user();
+        DB::beginTransaction();
+
+        try {
+            $form = PrempdrForm::where('no', $no)->first();
+            $form->delete();
+            DB::commit();
+
+            activity()
+            ->performedOn($form)
+            ->inLog('prempdr')
+            ->event('Delete')
+            ->causedBy($user)
+            ->withProperties(['no' => $no, 'action' => 'deleted'])
+            ->log('Delete PreMpdr Form ' . $no . ' by ' . $user->name . ' at ' . now());
+
+            Alert::toast('Form successfully deleted!.', 'success');
+            return redirect()->route('prempdr.index');
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollback();
+            Alert::toast('There was an error updating the form.'.$e->getMessage(), 'error');
+            return back();
+        }
     }
 
     public function report()
@@ -303,6 +336,167 @@ class PreMpdrController extends Controller
     public function template()
     {
         return view('page.pre-mpdr.template-form-prempdr');
+    }
+
+    public function showDraftForm($no_reg){
+        confirmDelete();
+        return view('page.pre-mpdr.draft-prempdr')->with('no_reg', $no_reg);
+    }
+
+    public function draftStore(Request $request)
+    {
+        // dd($request, $request->productCategory);
+        $validated = $request->validate([
+            'form_status' => 'required|string|in:Draft,Submit',
+            'no_reg' => 'required|string',
+            'projectName' => 'required|string|max:255',
+            'levelPriority' => 'required',
+            'brandName' => 'required',
+            'rationalForDevelopment' => 'required',
+            'productCategory' => 'required',
+            'productCategoryText' => '',
+            'channel' => 'required',
+            'country' => '',
+            'productDescription' => 'required',
+            'usageDescription' => 'required|string',
+            'storageTemperature' => 'required|string',
+            'deliveryTemperature' => 'required|string',
+            'certification' => 'required',
+            'certificationText' => '',
+            'productName1' => '',
+            'size1' => '',
+            'packaging1' => '',
+            'priceIndication1' => '',
+            'productName2' => '',
+            'size2' => '',
+            'packaging2' => '',
+            'priceIndication2' => '',
+            'weightProduct' => 'required',
+            'packaging' => 'required',
+            'ExistingPackagingText' => '',
+            'NewPackagingText' => '',
+            'productVariation' => 'required',
+            'potentialVolume' => 'required',
+            'expectedMargin' => 'required',
+            'priceEstimate' => 'required',
+            'targetLaunchText' => 'required',
+            'initiator' => 'required|string',
+            'salesManager' => 'required|string',
+            'marketingManager' => 'required|string',
+            'deptHead' => 'required|string',
+        ]);
+
+        // Mulai transaction untuk memastikan integritas data
+        DB::beginTransaction();
+
+        try {
+            $user = Auth::user();
+            $form = PreMpdrForm::where('no', $validated['no_reg'])
+            ->where('user_id', $user->id)
+            ->first();
+            
+            $form->update([
+                'status' => $validated['form_status'] == 'Submit' ? 'In Approval' : $validated['form_status'],
+                'route_to' => $validated['form_status'] == 'Submit' ? User::where('nik', $validated['initiator'])->first()->name : null
+            ]);
+
+            // Simpan FormDetail terkait dengan Form
+            $form->detail()->update([
+                'rational_for_development' => $validated['rationalForDevelopment'],
+                'target_launch' => $validated['targetLaunchText']
+            ]);
+            $form->category()->update([
+                'category' => $validated['productCategory'],
+                'other' => $validated['productCategory'] == 'Others' ? $validated['productCategoryText'] : null
+            ]);
+            $form->channel()->update([
+                'category' => $validated['channel'],
+                'country' => $validated['channel'] == 'International' ? $validated['country'] : null
+            ]);
+            $form->description()->update(
+                [
+                'product_description' => $validated['productDescription'],
+                'usage_description' => $validated['usageDescription'],
+                'storage_temperature' => $validated['storageTemperature'],
+                'delivery_temperature' => $validated['deliveryTemperature']
+                ]
+            );
+            $form->certification()->update([
+                'category' => $validated['certification'],
+                'other' => $validated['certification'] == 'Others' ? $validated['certificationText'] : null
+            ]);
+
+            if($request->productName1 || $request->productName2){
+                $form->competitor()->delete();
+            }
+
+            if($request->productName1){
+                $form->competitor()->create([
+                    'form_id' => $form->id,
+                    'name' => $validated['productName1'],
+                    'size' => $validated['size1'],
+                    'packaging' => $validated['packaging1'],
+                    'price' => $validated['priceIndication1']
+                ]);
+            }
+            if($request->productName2){
+                $form->competitor()->update([
+                    'form_id' => $form->id,
+                    'name' => $validated['productName2'],
+                    'size' => $validated['size2'],
+                    'packaging' => $validated['packaging2'],
+                    'price' => $validated['priceIndication2']
+                ]);
+            }
+            $form->packaging()->update([
+                'weight' => $validated['weightProduct'],
+                'category' => $validated['packaging'],
+                'detail' => $validated[$validated['packaging'].'PackagingText'],
+                'product_variation' => $validated['productVariation']
+            ]);
+            $form->market()->update([
+                'potential_volume' => $validated['potentialVolume'],
+                'expected_margin' => $validated['expectedMargin'],
+                'price_estimate' => $validated['priceEstimate']
+            ]);
+
+            $form->approver()->update([
+                'initiator' => $validated['initiator'],
+                'sales_manager' => $validated['salesManager'],
+                'marketing_manager' => $validated['marketingManager'],
+                'department_head' => $validated['deptHead']
+            ]);
+
+            $approvers = ['initiator', 'salesManager', 'marketingManager', 'deptHead'];
+
+            foreach($approvers as $index => $approver){
+                $form->approvedDetail()->where('level', $index+1)->update([
+                    'approver' => $validated[$approver],
+                    'name' => User::where('nik', $validated[$approver])->first()->name,
+                    'token' => Str::uuid()
+                ]);
+            }
+
+            activity()
+            ->performedOn($form)
+            ->inLog('prempdr')
+            ->event('Update')
+            ->causedBy($user)
+            ->withProperties(['no' => $validated['no_reg'], 'action' => 'updated'])
+            ->log('Update PreMpdr Form ' . $validated['no_reg'] . ' by ' . $user->name . ' at ' . now());
+
+            // Commit transaksi
+            DB::commit();
+            Alert::toast('Form successfully updated!', 'success');
+            return redirect()->route('prempdr.index');
+            
+        } catch (\Exception $e) {
+            // dd($e);
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollback();
+            Alert::toast('There was an error updating the form.'.$e->getMessage(), 'error');
+            return back();
+        }
     }
 
     public function getFormList()

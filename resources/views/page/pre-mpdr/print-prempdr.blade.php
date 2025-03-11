@@ -426,18 +426,10 @@
                     $('#expectedMargin').val(response.market.expected_margin);
                     $('#priceEstimate').val(response.market.price_estimate);
                     
+                    var approvers = ["#initiator", "#salesManager", "#marketingManager", "#deptHead"];
                     var divId;
                     response.approved_detail.forEach(function(detail, index) {
-                        if(detail.approver == response.approver.initiator){
-                            divId = '#initiator';
-                        }else if(detail.approver == response.approver.sales_manager){
-                            divId = '#salesManager';
-                        }else if(detail.approver == response.approver.marketing_manager){
-                            divId = '#marketingManager';
-                        }else if(detail.approver == response.approver.department_head){
-                            divId = '#deptHead';
-                        }
-                        
+                        divId = approvers[index];
                         newDiv = '';
                         if (detail.status){
                             newDiv = document.createElement('div');

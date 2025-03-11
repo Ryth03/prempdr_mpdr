@@ -15,6 +15,8 @@ use App\Models\PREMPDR\PreMpdrMarketUpdate;
 use App\Models\PREMPDR\PreMpdrApprover;
 use App\Models\PREMPDR\PreMpdrApprovedDetail;
 use App\Models\PREMPDR\PreMpdrRevision;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class PreMpdrForm extends Model
 {
@@ -27,7 +29,8 @@ class PreMpdrForm extends Model
         'project_name',
         'brand_name',
         'level_priority',
-        'status'
+        'status',
+        'route_to'
     ];
 
     public function revision()

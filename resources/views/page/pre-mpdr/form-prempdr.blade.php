@@ -204,8 +204,8 @@
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="certification" id="certification3">
-                        <label class="form-check-label" for="certification3">
+                        <input class="form-check-input" type="radio" name="certification" id="Others">
+                        <label class="form-check-label" for="Others">
                             Others
                         </label>
                         <input type="text" class="form-control" id="certificationText" name="certificationText">
