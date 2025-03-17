@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\PreMpdr;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\PreMpdr\ProcessApproval;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -95,7 +96,6 @@ class PreMpdrController extends Controller
                 'status' => $validated['form_status'] == 'Submit' ? 'In Approval' : $validated['form_status'],
                 'route_to' => $validated['form_status'] == 'Submit' ? User::where('nik', $validated['initiator'])->first()->name : null
             ]);
-
             // Simpan FormDetail terkait dengan Form
             $form->detail()->create([
                 'form_id' => $form->id,
@@ -174,6 +174,10 @@ class PreMpdrController extends Controller
                     'level' => $index+1,
                     'token' => Str::uuid()
                 ]);
+            }
+
+            if($validated['form_status'] == 'Submit'){
+                $this->sendMailToApprover($validated['no_reg']);
             }
 
             activity()
@@ -351,6 +355,10 @@ class PreMpdrController extends Controller
                 ]);
             }
 
+            if($validated['form_status'] == 'Submit'){
+                $this->sendMailToApprover($validated['no_reg']);
+            }
+
             activity()
             ->performedOn($form)
             ->inLog('prempdr')
@@ -450,16 +458,6 @@ class PreMpdrController extends Controller
         return response()->json(['no_reg' => $newNoReg]);
     }
 
-    public function getPrintData(Request $request)
-    {
-        $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver')->where('no', $request->input('id'))->first();
-        if($form){
-            return response()->json($form);
-        }
-
-        return response()->json("Tidak ada Form");
-    }
-
     public function getFormData(Request $request)
     {
         $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver', 'approvedDetail')->where('no', $request->input('no_reg'))->first();
@@ -507,5 +505,17 @@ class PreMpdrController extends Controller
         }
 
         return response()->json("Tidak ada Form");
+    }
+
+    private function sendMailToApprover($no_reg)
+    {
+        $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver', 'approvedDetail')
+        ->where('no', $no_reg)->first();
+        if($form->route_to){
+            $approved_detail = $form->approvedDetail->where('name', $form->route_to)->first();
+            $approver = User::where('nik', $approved_detail->approver)->first(); // Approver yang dituju
+    
+            ProcessApproval::dispatch($approver, $form, $approved_detail); // send email
+        }
     }
 }

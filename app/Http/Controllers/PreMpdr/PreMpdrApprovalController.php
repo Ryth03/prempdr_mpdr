@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\PreMpdr;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\Mpdr\ProcessApproval as MpdrProcessApproval;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\PREMPDR\PreMpdrForm;
 use App\Models\PREMPDR\PreMpdrRevision;
+use App\Jobs\PreMpdr\ProcessApproval;
+use App\Jobs\PreMpdr\sendResultToUser;
 
 class PreMpdrApprovalController extends Controller
 {
@@ -41,28 +44,19 @@ class PreMpdrApprovalController extends Controller
                     if($validated['action'] !== 'approve'){
                         $detail->comment = $request->input('comment');
                     }
+                    $detail->token = null;
                     $detail->save();
                     break;
                 }
             }
-            if($validated['action'] === 'approve' || $validated['action'] === 'approve with review'){
-                $notNull = True;
-                foreach($form->approvedDetail as $detail){
-                    if(!$detail->status){
-                        $notNull = False;
-                        $form->route_to = $detail->name;
-                        break;
-                    }
-                }
-                if($notNull){
-                    $form->status = 'Approved';
-                    $form->route_to = null;
-                }
+            
+            // Cek jika status masuk in approval
+            if($this->checkFormInApprovalStatus($no_reg)){
+                $this->sendMailToApprover($no_reg); // kirim email jika masih ada yang belum approve
+                $this->sendMailToUser($no_reg); // kirim email ke admin
             }else{
-                $form->status = 'Rejected';
-                $form->route_to = null;
+                $this->sendMailToUser($no_reg);
             }
-            $form->save();
 
             activity()
             ->performedOn($form)
@@ -77,7 +71,7 @@ class PreMpdrApprovalController extends Controller
             return redirect()->route('prempdr.approval');
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
-            dd($e);
+            // dd($e);
             DB::rollback();
             Alert::toast('There was an error saving the form.'.$e->getMessage(), 'error');
             return back();
@@ -126,5 +120,263 @@ class PreMpdrApprovalController extends Controller
     public function getApprovalFormData($no_reg)
     {
         return view('page.pre-mpdr.form-approval-prempdr')->with('no_reg', $no_reg);
+    }
+
+
+    private function sendMailToApprover($no_reg)
+    {
+        $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver', 'approvedDetail')
+        ->where('no', $no_reg)->first();
+        if($form->route_to && $form->status == 'In Approval'){
+            $approved_detail = $form->approvedDetail->where('name', $form->route_to)->first();
+            $approver = User::where('nik', $approved_detail->approver)->first(); // Approver yang dituju
+    
+            ProcessApproval::dispatch($approver, $form, $approved_detail); // send email
+        }
+    }
+
+    private function sendMailToUser($no_reg)
+    {
+        $form = PreMpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approver', 'approvedDetail')
+        ->where('no', $no_reg)->first();
+        if($form->status == 'Approved'){
+            $allApproverNik = $form->approvedDetail()->pluck('approver'); // Semua user yang dituju
+            $allApprover = User::whereIn('nik', $allApproverNik)->get(); // Ambil usernya
+            $allAdmin = User::whereHas('roles', function($query) {
+                $query->where('name', 'super-admin');
+            })->get(); // Semua super admin 
+            $allUser = $allApprover->merge($allAdmin)->unique('id');
+
+            foreach($allUser as $user){ // Foreach semua user
+                sendResultToUser::dispatch($user,  $form); // send email
+            }
+        }else if($form->status == 'Rejected'){
+            $initiator = User::where('nik', $form->approver->initiator)->first();
+            $allAdmin = User::whereHas('roles', function($query) {
+                $query->where('name', 'super-admin');
+            })->get(); // Semua super admin 
+            $allUser = $allAdmin->push($initiator)->unique('id'); // Gabung initiator dan admin
+
+            //foreach initiator dan admin
+            foreach($allUser as $user){
+                sendResultToUser::dispatch($user, $form); // send email
+            }
+
+        }else if($form->status == 'In Approval'){
+            $admins = User::whereHas('roles', function($query) {
+                $query->where('name', 'super-admin');
+            })->get(); // Semua email super admin 
+            
+            foreach($admins as $admin){ // Foreach semua admin
+                sendResultToUser::dispatch($admin, $form); // send email
+            }
+        }
+    }
+
+    private function checkFormInApprovalStatus($no_reg){
+        $form = PreMpdrForm::with('approvedDetail')
+        ->where('status', 'In Approval')
+        ->where('no', $no_reg)->first();
+        if($form){
+            $approved = True;
+            foreach($form->approvedDetail as $detail){
+                if($detail->status === 'not approve'){
+                    $form->status = 'Rejected';
+                    $form->route_to = null;
+                    $approved = False;
+                    $form->save();
+                    break;
+                }else if($detail->status === null){
+                    $form->route_to = $detail->name;
+                    break;
+                }
+            }
+            
+            if($approved){
+                $form->status = 'Approved';
+                $form->save();
+            }
+            
+            if($form->status === 'In Approval'){
+                return True;
+            }else{
+                return False;
+            }
+        }
+
+        return False;
+    }
+
+
+    public function approveNotReview(Request $request)
+    {
+        $form_no = $request->query('form_no');
+        $approver_nik = $request->query('approver_nik');
+        $status = $request->query('status');
+        $token = $request->query('token');
+        $result = '';
+        DB::beginTransaction();
+        try {
+            $form = PreMpdrForm::where('no', $form_no)->first();
+            $approverDetail = $form->approvedDetail->where('approver', $approver_nik)->first();
+            if($approverDetail->token === $token){
+                $approverDetail->status = $status;
+                $approverDetail->token = null;
+                $approverDetail->approved_date = now();
+                $approverDetail->save();
+                $result = 'Success';
+
+                $approver = User::where('nik', $approver_nik)->first();
+                activity()
+                    ->performedOn($form)
+                    ->inLog('prempdr')
+                    ->event('Approve')
+                    ->causedBy($approver)
+                    ->withProperties(['no' => $form_no, 'action' => 'approve'])
+                    ->log('Approve PreMpdr Form ' . $form_no . ' by ' . $approver->name . ' at ' . now());
+                    
+                
+                // Cek jika status masuk in approval
+                if($this->checkFormInApprovalStatus($form_no)){
+                    $this->sendMailToApprover($form_no); // kirim email jika masih ada yang belum approve
+                    $this->sendMailToUser($form_no); // kirim email ke admin
+                }else{
+                    $this->sendMailToUser($form_no);
+                }
+
+                DB::commit();
+            }else{
+                
+                DB::rollback();
+                $result = 'You have already approved this form previously.';
+                $status = $approverDetail->status;
+            }
+
+
+            return view('emails.pre-mpdr.resultView', compact('form_no', 'result', 'status'));
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            dd($e);
+            DB::rollback();
+            $result = 'Failed';
+            return view('emails.pre-mpdr.resultView', compact('form_no', 'result', 'status'));
+        }
+    }
+
+    public function approveWithReview(Request $request)
+    {
+        $form_no = $request->query('form_no');
+        $approver_nik = $request->query('approver_nik');
+        $status = $request->query('status');
+        $token = $request->query('token');
+        $route_name = 'approveWithReview';
+        return view('emails.pre-mpdr.commentForm', compact('form_no', 'approver_nik', 'status', 'token', 'route_name'));
+    }
+
+    public function notApprove(Request $request)
+    {
+        $form_no = $request->query('form_no');
+        $approver_nik = $request->query('approver_nik');
+        $status = $request->query('status');
+        $token = $request->query('token');
+        $route_name = 'notApprove';
+        return view('emails.pre-mpdr.commentForm', compact('form_no', 'approver_nik', 'status', 'token', 'route_name'));
+    }
+
+    public function mailComment(Request $request)
+    {
+        $form_no = $request->query('form_no');
+        $approver_nik = $request->query('approver_nik');
+        $status = $request->query('status');
+        $token = $request->query('token');
+        $comment = $request->input('comment');
+        $result = '';
+        DB::beginTransaction();
+        try {
+            $form = PreMpdrForm::where('no', $form_no)->first();
+            $approverDetail = $form->approvedDetail->where('approver', $approver_nik)->first();
+            if($approverDetail->token === $token){
+                $approverDetail->status = $status;
+                $approverDetail->comment = $comment;
+                $approverDetail->token = null;
+                $approverDetail->approved_date = now();
+                $approverDetail->save();
+                $result = 'Success';
+
+                $approver = User::where('nik', $approver_nik)->first();
+                activity()
+                    ->performedOn($form)
+                    ->inLog('prempdr')
+                    ->event('Approve')
+                    ->causedBy($approver)
+                    ->withProperties(['no' => $form_no, 'action' => 'approve'])
+                    ->log('Approve PreMpdr Form ' . $form_no . ' by ' . $approver->name . ' at ' . now());
+                    
+                    
+                // Cek jika status masuk in approval
+                if($this->checkFormInApprovalStatus($form_no)){
+                    $this->sendMailToApprover($form_no); // kirim email jika masih ada yang belum approve
+                    $this->sendMailToUser($form_no); // kirim email ke admin
+                }else{
+                    $this->sendMailToUser($form_no);
+                }
+
+                DB::commit();
+            }else{
+                
+                DB::rollback();
+                $result = 'You have already approved this form previously.';
+                $status = $approverDetail->status;
+            }
+
+
+            return view('emails.pre-mpdr.resultView', compact('form_no', 'result', 'status'));
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            dd($e);
+            DB::rollback();
+            $result = 'Failed';
+            return view('emails.pre-mpdr.resultView', compact('form_no', 'result', 'status'));
+        }
+    }
+
+    private function formatStatus($status)
+    {
+
+    }
+
+    private function checkAndUpdateVacantAndPendingPcc($pcr)
+    {
+
+    }
+
+    private function handleGMApprovalPCR($pcr)
+    {
+
+    }
+
+    private function isLastApproval($pcr)
+    {
+
+    }
+
+    private function sendApprovalNotification($pcr, $status, $approverId)
+    {
+
+    }
+
+    private function sendNotificationToAll($pcr, $decision)
+    {
+        
+    }
+
+    private function sendNotificationToAdminAndInitiator($pcr, $decision)
+    {
+       
+    }
+
+    public function sendEmailToGM($pcrId)
+    {
+        
     }
 }

@@ -25,6 +25,9 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
 use App\Http\Controllers\Master\LogController;
+use App\Models\PREMPDR\PreMpdrForm;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -104,7 +107,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/getFormList', [PreMpdrController::class, 'getFormList'])->name('prempdr.form.list');
         Route::get('/getFormData', [PreMpdrController::class, 'getFormData'])->name('prempdr.form.data');
         Route::get('/getReportData', [PreMpdrController::class, 'getReportData'])->name('prempdr.report.data');
-        Route::get('/print-data', [PreMpdrController::class, 'getPrintData'])->name('prempdr.print.data');
 
         
         Route::get('/approval-form-{no_reg}', [PreMpdrApprovalController::class, 'viewApprovalForm'])->name('prempdr.approval.form.view');
@@ -112,6 +114,30 @@ Route::middleware('auth')->group(function () {
         Route::get('/getApproverListData', [PreMpdrApprovalController::class, 'getApproverListData'])->name('prempdr.approver.list.data');
         Route::get('/getApprovalListData', [PreMpdrApprovalController::class, 'getApprovalListData'])->name('prempdr.approval.list.data');
         Route::get('/getApprovalFormData', [PreMpdrApprovalController::class, 'getApprovalFormData'])->name('prempdr.approval.form.data');
+
+        
+        Route::get('/mail-approve', [PreMpdrApprovalController::class, 'approveNotReview'])->name('prempdr.approveNotReview');
+        Route::get('/mail-approve-with-review', [PreMpdrApprovalController::class, 'approveWithReview'])->name('prempdr.approveWithReview');
+        Route::get('/mail-not-approve', [PreMpdrApprovalController::class, 'notApprove'])->name('prempdr.notApprove');
+        Route::POST('/mail-comment', [PreMpdrApprovalController::class, 'mailComment'])->name('prempdr.comment');
+        // Route::get('/test2', function (){
+        //     $user = Auth::user();
+        //     $form = PreMpdrForm::where('no', '25PREMPDR0004')->first();
+        //     $approvalNotReviewLink = '';
+        //     $approvalWithReviewLink = '';
+        //     $notApproveLink = '' ;
+        //     $allUser = $form->approvedDetail()->pluck('approver')->toArray();
+        //     $initiator = User::where('nik', $form->approver->initiator)->first();
+        //     $user = User::whereHas('roles', function($query) {
+        //         $query->where('name', 'super-admin');
+        //     })->get();
+        //     $allEmail = $user;
+        //     if($initiator) {
+        //         $allEmail->push($initiator);
+        //     }
+        //     dd($user, $initiator, $allEmail);
+        //     return view('emails.pre-mpdr.sendToUser', compact('form', 'user', 'approvalNotReviewLink', 'approvalWithReviewLink', 'notApproveLink'));
+        // });
     });
 
 

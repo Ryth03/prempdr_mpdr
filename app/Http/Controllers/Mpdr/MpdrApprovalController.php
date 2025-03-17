@@ -90,8 +90,8 @@ class MpdrApprovalController extends Controller
 
     public function getApprovalListData()
     {
-        $userLogin = Auth::user();
-        $nik = $userLogin->nik;
+        $user = Auth::user();
+        $nik = $user->nik;
         $forms = null;
         
         $forms = MpdrForm::where('status', 'In Approval')
@@ -100,8 +100,8 @@ class MpdrApprovalController extends Controller
         })
         ->get();
         
-        /** @var User $userLogin */
-        if($userLogin->hasRole('gm'))
+        /** @var User $user */
+        if($user->hasRole('gm'))
         {
             $additionalForms = MpdrForm::with('initiatorDetail')->where('status', 'In Approval')
             ->whereHas('initiatorDetail', function ($query) use($nik){
@@ -122,7 +122,7 @@ class MpdrApprovalController extends Controller
                 return response()->json($allForms);
             }
         }
-        else if($userLogin->hasRole('approver'))
+        else if($user->hasRole('approver'))
         {
             $additionalForms = MpdrForm::where('status', 'In Approval')
             ->whereHas('initiatorDetail', function ($query) use($nik){
@@ -153,9 +153,9 @@ class MpdrApprovalController extends Controller
         DB::beginTransaction();
         try {
             
-            /** @var User $userLogin */
-            $userLogin = Auth::user();
-            $nik = $userLogin->nik;
+            /** @var User $user */
+            $user = Auth::user();
+            $nik = $user->nik;
 
             // Mengambil form
             $form = MpdrForm::with('initiatorDetail')
@@ -191,7 +191,7 @@ class MpdrApprovalController extends Controller
                 }
             }else{
                 // Cek apakah yang login punya role approver
-                if($userLogin->hasRole('approver')){
+                if($user->hasRole('approver')){
                     $form = MpdrForm::with('initiatorDetail')
                     ->where('no', $no_reg)
                     ->where('status', 'In Approval')
@@ -218,7 +218,7 @@ class MpdrApprovalController extends Controller
                     }
 
                     // Cek apakah yang approve adalah gm
-                    if($userLogin->hasRole('gm'))
+                    if($user->hasRole('gm'))
                     {
                         foreach($form->approvedDetail as $detail){
                             if($detail->status === 'vacant'){
@@ -260,6 +260,13 @@ class MpdrApprovalController extends Controller
                 
             }
             
+            activity()
+            ->performedOn($form)
+            ->inLog('mpdr')
+            ->event('Approve')
+            ->causedBy($user)
+            ->withProperties(['no' => $no_reg, 'action' => 'approved'])
+            ->log('Approve Mpdr Form ' . $no_reg . ' by ' . $user->name . ' at ' . now());
             
             DB::commit();
             Alert::toast('Form successfully ' . $request->input('action') . '!', 'success');

@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Master\Department;
 use App\Models\Master\Position;
 use App\Models\Master\Section;
+use App\Models\PREMPDR\PreMpdrForm;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -54,6 +55,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function forms()
+    {
+        return $this->hasMany(PreMpdrForm::class, 'user_id');
+    }
 
     public function department()
     {
