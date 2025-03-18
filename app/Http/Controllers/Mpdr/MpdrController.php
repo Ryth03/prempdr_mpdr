@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Mpdr;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\MPDR\MpdrInitiatorController;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -166,10 +167,14 @@ class MpdrController extends Controller
                         'form_id' => $form->id,
                         'approver_nik' => $approver->approver_nik,
                         'approver_name' => $approver->approver_name,
-                        'status' => $approver->approver_status == 'Active' ? 'Active' : 'Vacant',
+                        'status' => $approver->approver_status == 'Active' ? 'pending' : 'Vacant',
                         'token' => $approver->approver_status == 'Active' ? Str::uuid() : null
                     ]);
                 }
+                
+                // Kirim email ke initiator
+                $MpdrInitiatorController = new MpdrInitiatorController();
+                $MpdrInitiatorController->sendMailToInitiator($form->no);
             }
 
             activity()
@@ -334,10 +339,14 @@ class MpdrController extends Controller
                         'form_id' => $form->id,
                         'approver_nik' => $approver->approver_nik,
                         'approver_name' => $approver->approver_name,
-                        'status' => $approver->approver_status == 'Active' ? 'Active' : 'Vacant',
+                        'status' => $approver->approver_status == 'Active' ? 'pending' : 'Vacant',
                         'token' => $approver->approver_status == 'Active' ? Str::uuid() : null
                     ]);
                 }
+                
+                // Kirim email ke initiator
+                $MpdrInitiatorController = new MpdrInitiatorController();
+                $MpdrInitiatorController->sendMailToInitiator($form->no);
             }
 
             activity()

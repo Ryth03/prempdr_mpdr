@@ -71,7 +71,6 @@ class PreMpdrApprovalController extends Controller
             return redirect()->route('prempdr.approval');
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
-            // dd($e);
             DB::rollback();
             Alert::toast('There was an error saving the form.'.$e->getMessage(), 'error');
             return back();
@@ -188,6 +187,7 @@ class PreMpdrApprovalController extends Controller
                     break;
                 }else if($detail->status === null){
                     $form->route_to = $detail->name;
+                    $approved = False;
                     break;
                 }
             }
@@ -256,7 +256,6 @@ class PreMpdrApprovalController extends Controller
             return view('emails.pre-mpdr.resultView', compact('form_no', 'result', 'status'));
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
-            dd($e);
             DB::rollback();
             $result = 'Failed';
             return view('emails.pre-mpdr.resultView', compact('form_no', 'result', 'status'));
@@ -333,50 +332,9 @@ class PreMpdrApprovalController extends Controller
             return view('emails.pre-mpdr.resultView', compact('form_no', 'result', 'status'));
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
-            dd($e);
             DB::rollback();
             $result = 'Failed';
             return view('emails.pre-mpdr.resultView', compact('form_no', 'result', 'status'));
         }
-    }
-
-    private function formatStatus($status)
-    {
-
-    }
-
-    private function checkAndUpdateVacantAndPendingPcc($pcr)
-    {
-
-    }
-
-    private function handleGMApprovalPCR($pcr)
-    {
-
-    }
-
-    private function isLastApproval($pcr)
-    {
-
-    }
-
-    private function sendApprovalNotification($pcr, $status, $approverId)
-    {
-
-    }
-
-    private function sendNotificationToAll($pcr, $decision)
-    {
-        
-    }
-
-    private function sendNotificationToAdminAndInitiator($pcr, $decision)
-    {
-       
-    }
-
-    public function sendEmailToGM($pcrId)
-    {
-        
     }
 }

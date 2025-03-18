@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\MPDR;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\Mpdr\ProcessApproval;
+use App\Jobs\Mpdr\sendResultToUser;
+use App\Jobs\Mpdr\sendUpdateToAdmin;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Auth;
@@ -77,7 +80,6 @@ class MpdrApprovalController extends Controller
                 'message' => 'Approver saved successfully!'
             ]);
         } catch (\Exception $e) {
-            dd($e);
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
             
@@ -169,8 +171,8 @@ class MpdrApprovalController extends Controller
                 return back();
             }
 
-            // Cek apakah status initiator pending
-            if($form->initiatorDetail->status == 'pending'){
+            // Cek apakah status initiator pending dan token tidak null
+            if($form->initiatorDetail->status == 'pending' && $form->initiatorDetail->token !== null){
                 // Cek apakah yang login initiator
                 if($form->initiatorDetail->initiator_nik == $nik){
                     $form->initiatorDetail->status = $request->input('action');
@@ -181,8 +183,16 @@ class MpdrApprovalController extends Controller
                     $form->initiatorDetail->token = null;
                     $form->initiatorDetail->save();
                     if($request->input('action') !== 'approve' && $request->input('action') !== 'approve with review'){
-                        $form->status = 'Rejected';
+                        $form->status = 'Rejected'; 
                         $form->save();
+
+                        // Jika form di reject maka kirim email ke admin saja
+                        $this->sendMailToAdmin($no_reg, $user);
+
+                    }else{
+                        // Jika form di approve oleh initiator maka kirim email ke semua approver kecuali gm dan ke admin
+                        $this->sendMailToApproversExceptGM($no_reg);
+                        $this->sendMailToAdmin($no_reg, $user);
                     }
                 }else{
                     DB::rollback();
@@ -213,6 +223,11 @@ class MpdrApprovalController extends Controller
                             }
                             $detail->token = null;
                             $detail->save();
+
+                            // Cek apakah form status masih in approval
+                            $this->checkFormInApprovalStatus($no_reg);
+                            // Kirim email update ke admin
+                            $this->sendMailToAdmin($no_reg, $user);
                             break;
                         }
                     }
@@ -222,11 +237,12 @@ class MpdrApprovalController extends Controller
                     {
                         foreach($form->approvedDetail as $detail){
                             if($detail->status === 'vacant'){
-                                $detail->status = $request->input('action');
                                 $detail->approved_date = now();
                                 if($request->input('action') === 'approve' || $request->input('action') === 'approve with review'){
+                                    $detail->status = 'approve with review';
                                     $detail->comment = "Approve by GM";
                                 }else if($request->input('action') === 'not approve'){
+                                    $detail->status = $request->input('action');
                                     $detail->comment = "Not approve by GM";
                                 }
                                 $detail->token = null;
@@ -235,23 +251,9 @@ class MpdrApprovalController extends Controller
                         }
                     }
 
-                    // Cek apakah form status approve atau reject
-                    if($request->input('action') === 'approve' || $request->input('action') === 'approve with review'){
-                        $notNull = True;
-                        foreach($form->approvedDetail as $detail){
-                            if($detail->status == 'pending' || $detail->status == 'not approve'){
-                                $notNull = False;
-                                break;
-                            }
-                        }
-                        // Status form Approved jika tidak ada yang pending / not approve
-                        if($notNull){
-                            $form->status = 'Approved';
-                        }
-                    }else{
-                        $form->status = 'Rejected';
-                    }
-                    $form->save();
+                    $this->sendMailToUser($no_reg); // Kirim email berdasarkan status form
+                    
+                    
                 }else{
                     DB::rollback();
                     Alert::toast("User is not allowed to approve.", 'error');
@@ -273,11 +275,360 @@ class MpdrApprovalController extends Controller
             return redirect()->route('mpdr.approval');
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
-            // dd($e);
             DB::rollback();
             Alert::toast('There was an error saving the form.'.$e->getMessage(), 'error');
             return back();
         }
         
     }
+
+    private function sendMailToAdmin($no_reg, $approver)
+    {
+        $form = MpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approvedDetail', 'initiatorDetail')
+        ->where('no', $no_reg)->first();
+
+        $admins = User::whereHas('roles', function($query) {
+            $query->where('name', 'super-admin');
+        })->get(); // Ambil semua super admin 
+        
+        foreach($admins as $admin){ // Foreach semua admin
+            sendUpdateToAdmin::dispatch($admin, $form, $approver); // send email ke admin
+        }
+    }
+    
+    private function sendMailToApproversExceptGM($no_reg)
+    {
+        // Kirim form ke semua approver kecuali gm
+        $form = MpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'initiatorDetail', 'approvedDetail')
+        ->where('no', $no_reg)->first();
+        
+        if($form->status == 'In Approval'){ // Cek jika status form masih In Approval
+            foreach($form->approvedDetail as $detail){ // send email ke semua approver kecuali gm
+                $user = User::where('nik', $detail->approver_nik)->first(); 
+                if(!$user->hasRole('gm') && $detail->status == 'pending'){
+                    ProcessApproval::dispatch($user, $form, $detail); 
+                }
+            }
+        }
+    }
+
+    private function sendMailToUser($no_reg)
+    {
+        $form = MpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'initiatorDetail', 'approvedDetail')
+        ->where('no', $no_reg)->first();
+
+        if($form->status == 'Approved') // Kirim ke semuanya jika form status Approved
+        { 
+            $allApproverNik = $form->approvedDetail()->pluck('approver_nik'); // Semua nik approver yang dituju
+            $allApprover = User::whereIn('nik', $allApproverNik)->get(); // Ambil usernya
+            $allAdmin = User::whereHas('roles', function($query) {
+                $query->where('name', 'super-admin');
+            })->get(); // Semua super admin 
+            $allUser = $allApprover->merge($allAdmin)->unique('id');
+
+            foreach($allUser as $user){ // Foreach semua user
+                sendResultToUser::dispatch($user,  $form); // send email
+            }
+        }
+        else if($form->status == 'Rejected') // Kirim ke initiator dan admin jika form status rejected
+        { 
+            $initiator = User::where('nik', $form->initiatorDetail->initiator_nik)->first();
+            $allAdmin = User::whereHas('roles', function($query) {
+                $query->where('name', 'super-admin');
+            })->get(); // Semua super admin 
+            $allUser = $allAdmin->push($initiator)->unique('id'); // Gabung initiator dan admin
+
+            //foreach initiator dan admin
+            foreach($allUser as $user){
+                sendResultToUser::dispatch($user, $form); // send email
+            }
+
+        }
+        else if($form->status == 'In Approval') // Jika form in approval cek dan kirim ke gm
+        {
+            $this->sendMailToGM($no_reg);
+        }
+    }
+
+    public function sendMailToGM($no_reg)
+    {
+        $form = MpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approvedDetail', 'initiatorDetail')
+        ->where('no', $no_reg)->first();
+        if($form->status == 'In Approval') // cek jika status masih In Approval
+        {
+            // cek apakah semua approver kecuali gm sudah approve
+            $approveStatus = True;
+            $gm = null;
+            $gm_detail = null;
+            foreach($form->approvedDetail as $detail){
+                $user = User::where('nik', $detail->approver_nik)->first();
+                if(!$user->hasRole('gm'))
+                {
+                    if($detail->status == 'not approve' || $detail->status == 'pending')
+                    {
+                        $approveStatus = False;
+                        break;
+                    }
+                } 
+                else if ($user->hasRole('gm'))
+                {
+                    $gm = $user;
+                    $gm_detail = $detail;
+                    if($detail->status !== 'pending' && $detail->token == null ) // Cek jika gm sudah approve dan token null
+                    {
+                        $approveStatus = False;
+                        break;
+                    }
+                }
+            }
+
+            if($approveStatus){
+                ProcessApproval::dispatch($gm, $form, $gm_detail); 
+            }
+        }
+    }
+
+    private function checkFormInApprovalStatus($no_reg)
+    {
+        $form = MpdrForm::with('approvedDetail')
+        ->where('status', 'In Approval')
+        ->where('no', $no_reg)->first();
+        if($form){
+            $approved = True;
+            foreach($form->approvedDetail as $detail){
+                if($detail->status === 'not approve'){
+                    $form->status = 'Rejected';
+                    $form->route_to = null;
+                    $approved = False;
+                    $form->save();
+                    break;
+                }else if($detail->status == 'pending'){
+                    $approved = False;
+                }
+            }
+            
+            if($approved){
+                $form->status = 'Approved';
+                $form->save();
+            }
+            
+            if($form->status === 'In Approval'){
+                return True;
+            }else{
+                return False;
+            }
+        }
+
+        return False;
+    }
+
+
+    public function approveNotReview(Request $request)
+    {
+        $form_no = $request->query('form_no');
+        $approver_nik = $request->query('approver_nik');
+        $status = $request->query('status');
+        $token = $request->query('token');
+        $approver = User::where('nik', $approver_nik)->first();
+        $result = '';
+        DB::beginTransaction();
+        try {
+            $form = MpdrForm::where('no', $form_no)->first();
+
+            // Cek apakah status initiator pending dan token tidak null
+            if($form->initiatorDetail->status == 'pending' && $form->initiatorDetail->token !== null){
+                // Cek apakah yang login initiator
+                if($form->initiatorDetail->initiator_nik == $approver_nik){
+                    $form->initiatorDetail->status = $status;
+                    $form->initiatorDetail->approved_date = now();
+                    $form->initiatorDetail->token = null;
+                    $form->initiatorDetail->save();
+                    if($status !== 'approve' && $status !== 'approve with review'){
+                        $form->status = 'Rejected'; 
+                        $form->save();
+
+                        // Jika form di reject maka kirim email ke admin saja
+                        $this->sendMailToAdmin($form_no, $approver);
+
+                    }else{
+                        // kirim update ke admin
+                        $this->sendMailToAdmin($form_no, $approver);
+                        // Jika form di approve oleh initiator maka kirim email ke semua approver kecuali gm dan ke admin
+                        $this->sendMailToApproversExceptGM($form_no);
+                    }
+                    $result = 'Success';
+                }
+                else
+                {
+                    DB::rollback();
+                    $result = 'Initiator must approve first.';
+                    $status = $status;
+                }
+            }
+            else
+            {
+                $approverDetail = $form->approvedDetail->where('approver_nik', $approver_nik)->first();
+                if($approverDetail->status === 'pending' && $approverDetail->token === $token){
+                    $approverDetail->status = $status;
+                    $approverDetail->token = null;
+                    $approverDetail->approved_date = now();
+                    $approverDetail->save();
+                    $result = 'Success';
+    
+                    activity()
+                        ->performedOn($form)
+                        ->inLog('mpdr')
+                        ->event('Approve')
+                        ->causedBy($approver)
+                        ->withProperties(['no' => $form_no, 'action' => 'approve'])
+                        ->log('Approve Mpdr Form ' . $form_no . ' by ' . $approver->name . ' at ' . now());
+                        
+                    
+                    if($approver->hasRole('gm'))
+                    {
+                        foreach($form->approvedDetail as $detail){
+                            if($detail->status === 'Vacant'){
+                                $detail->approved_date = now();
+                                if($status === 'approve' || $status === 'approve with review'){
+                                    $detail->status = 'approve with review';
+                                    $detail->comment = "Approve by GM";
+                                }else if($status === 'not approve'){
+                                    $detail->status = $status;
+                                    $detail->comment = "Not approve by GM";
+                                }
+                                $detail->token = null;
+                                $detail->save();
+                            }
+                        }
+                    }
+                }else{
+                    DB::rollback();
+                    $result = 'Failed';
+                    $status = $approverDetail->status;
+                }
+            }
+
+            DB::commit();
+            $this->checkFormInApprovalStatus($form_no); // Cek jika status form
+            $this->sendMailToAdmin($form_no, $approver); // Kirim update ke admin
+            $this->sendMailToUser($form_no); // Kirim email sesuai status form
+            return view('emails.mpdr.resultView', compact('form_no', 'result', 'status'));
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollback();
+            $result = 'Failed';
+            return view('emails.mpdr.resultView', compact('form_no', 'result', 'status'));
+        }
+    }
+
+    public function approveWithReview(Request $request)
+    {
+        $form_no = $request->query('form_no');
+        $approver_nik = $request->query('approver_nik');
+        $status = $request->query('status');
+        $token = $request->query('token');
+        $route_name = 'approveWithReview';
+        return view('emails.mpdr.commentForm', compact('form_no', 'approver_nik', 'status', 'token', 'route_name'));
+    }
+
+    public function notApprove(Request $request)
+    {
+        $form_no = $request->query('form_no');
+        $approver_nik = $request->query('approver_nik');
+        $status = $request->query('status');
+        $token = $request->query('token');
+        $route_name = 'notApprove';
+        return view('emails.mpdr.commentForm', compact('form_no', 'approver_nik', 'status', 'token', 'route_name'));
+    }
+
+    public function mailComment(Request $request)
+    {
+        $form_no = $request->query('form_no');
+        $approver_nik = $request->query('approver_nik');
+        $status = $request->query('status');
+        $token = $request->query('token');
+        $comment = $request->input('comment');
+        $approver = User::where('nik', $approver_nik)->first();
+        $result = '';
+        DB::beginTransaction();
+
+        try {
+            $form = MpdrForm::where('no', $form_no)->first();
+
+            // Cek apakah status initiator pending dan token tidak null
+            if($form->initiatorDetail->status == 'pending' && $form->initiatorDetail->token !== null){
+                // Cek apakah yang login initiator
+                
+                if($form->initiatorDetail->initiator_nik == $approver_nik){
+                    $form->initiatorDetail->status = $status;
+                    $form->initiatorDetail->approved_date = now();
+                    if($request->input('action') !== 'approve'){
+                        $form->initiatorDetail->comment = $comment;
+                    }
+                    $form->initiatorDetail->token = null;
+                    $form->initiatorDetail->save();
+                    $form->save();
+                    if($status !== 'approve' && $status !== 'approve with review'){
+                        $form->status = 'Rejected'; 
+                        $form->save();
+
+                        // Jika form di reject maka kirim email ke admin saja
+                        $this->sendMailToAdmin($form_no, $approver);
+
+                    }else{
+                        // Jika form di approve oleh initiator maka kirim email ke semua approver kecuali gm dan ke admin
+                        $this->sendMailToAdmin($form_no, $approver);
+                        $this->sendMailToApproversExceptGM($form_no);
+                    }
+                    
+                    $result = 'Success';
+                }
+                else
+                {
+                    DB::rollback();
+                    $result = 'Initiator must approve first.';
+                    $status = $status;
+                }
+            }
+            else
+            {
+                $approverDetail = $form->approvedDetail->where('approver_nik', $approver_nik)->first();
+                if($approverDetail->token === $token){
+                    $approverDetail->status = $status;
+                    $approverDetail->comment = $comment;
+                    $approverDetail->token = null;
+                    $approverDetail->approved_date = now();
+                    $approverDetail->save();
+                    $result = 'Success';
+
+                    activity()
+                        ->performedOn($form)
+                        ->inLog('mpdr')
+                        ->event('Approve')
+                        ->causedBy($approver)
+                        ->withProperties(['no' => $form_no, 'action' => 'approve'])
+                        ->log('Approve Mpdr Form ' . $form_no . ' by ' . $approver->name . ' at ' . now());
+                        
+                }else{
+                    
+                    DB::rollback();
+                    $result = 'You have already approved this form previously.';
+                    $status = $approverDetail->status;
+                }
+            }
+
+            DB::commit();
+            $this->checkFormInApprovalStatus($form_no); // Cek jika status form
+            $this->sendMailToAdmin($form_no, $approver); // Kirim update ke admin
+            $this->sendMailToUser($form_no); // Kirim email sesuai status form
+            return view('emails.mpdr.resultView', compact('form_no', 'result', 'status'));
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            DB::rollback();
+            $result = 'Failed';
+            return view('emails.mpdr.resultView', compact('form_no', 'result', 'status'));
+        }
+    }
+
+    
 }

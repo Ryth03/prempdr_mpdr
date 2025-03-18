@@ -22,14 +22,22 @@
         <thead>
             <tr class="header-style">
                 <td colspan="2">
-                    <h2>Pre-MPDR</h2>
+                    <h2>Mpdr</h2>
                     <h5>PT Sinar Meadow International Indonesia</h5>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    <p>A new Pre-MPDR request is submitted for your review and approval. Please review the details below:</p>
+                    @if($form->status == 'Approved') {{-- Ini untuk semuanya --}}
+                        <p>Dear <strong>All</strong>,</p>
+                        <p>Form Mpdr {{$form->no}} has been <span style="color: green;">Approved</span>.</p>
+                    @elseif($form->status == 'Rejected') {{-- Ini untuk initiator dan admin --}}
+                        <p>Dear <strong>initiator</strong> & <strong>super-admin</strong>,</p>
+                        <p>Form Mpdr {{$form->no}} has been <span style="color: red;">Rejected</span> by {{$form->approvedDetail->where('status', 'not approve')->first()->name}}.</p>
+                    @elseif($form->status == 'In Approval') {{-- Ini untuk admin --}}
+                        <p>Dear <strong>super-admin</strong>,</p> 
+                        <p>Form Mpdr {{$form->no}} has been <span style="color: green;">Approved</span> by {{$approver->name}}.</p>
+                    @endif
                 </td>
             </tr>
         </thead>
@@ -39,22 +47,21 @@
                         <h5 class="text-center">Pre-MARKETING PRODUCT DEVELOPMENT REQUEST</h5>
                     </th>
                 </tr>
-            
                 <tr class="tr-odd">
                     <td width="40%">No Reg:</td>
                     <td width="60">{{$form->no}}</td>
                 </tr>
                 <tr>
-                    <td>Project Name:</td>
-                    <td>{{$form->project_name ?? ''}}</td>
+                    <td>Product Name:</td>
+                    <td>{{$form->product_name ?? ''}}</td>
                 </tr>
                 <tr class="tr-odd">
                     <td>Level Priority:</td>
                     <td>{{$form->level_priority ?? ''}}</td>
                 </tr>
                 <tr>
-                    <td>Proposed BRAND Name:</td>
-                    <td>{{$form->brand_name ?? ''}}</td>
+                    <td>Initiator:</td>
+                    <td>{{$form->initiator ?? ''}}</td>
                 </tr>
                 <tr class="tr-odd">
                     <td>Rational For Development:</td>
@@ -66,10 +73,7 @@
                 </tr>
                 <tr class="tr-odd">
                     <td>Channel:</td>
-                    <td>
-                        <p>{{$form->channel->category ?? ''}}</p>
-                        <p>{{$form->channel->country ?? ''}}</p>
-                    </td>
+                    <td>{{$form->channel->category ?? ''}} {{$form->channel->country ?? ''}}</td>
                 </tr>
                 <tr>
                     <th>GENERAL PRODUCT DESCRIPTION AND FUNCTION</th>
@@ -93,10 +97,7 @@
                 </tr>
                 <tr class="tr-odd">
                     <td>Certification Requirement:</td>
-                    <td>
-                        <p>{{ $form->certification->category ?? '' }}</p>
-                        <p>{{ $form->certification->other ?? '' }}</p>
-                    </td>
+                    <td>{{ $form->certification->category ?? '' }} {{ $form->certification->other ?? '' }}</td>
                 </tr>
                 <tr>
                     <th>Competitor's Product to Match or to Beat</th>
@@ -132,10 +133,7 @@
                 </tr>
                 <tr class="tr-odd">
                     <td>Packaging:</td>
-                    <td>
-                        <p>{{ $form->packaging->category ?? '' }}</p>
-                        <p>{{ $form->packaging->detail ?? '' }}</p>
-                    </td>
+                    <td>{{ $form->packaging->category ?? '' }} {{ $form->packaging->detail ?? '' }}</td>
                 </tr>
                 <tr>
                     <td>Product Variation List:</td>
@@ -166,23 +164,26 @@
                     <td>{{ $form->detail->target_launch ?? '' }}</td>
                 </tr>
                 <tr class="tr-odd">
-                    <th colspan="2">
-                        <a href="{{$approvalNotReviewLink}}" target="_blank" value="approve" style="text-decoration: none; color: green; font-size: 24px; font-weight: bold; margin-right: 20px;">
-                            Approve
-                        </a>
-                        <a href="{{$approvalWithReviewLink}}" target="_blank" value="approve with review" style="text-decoration: none; color: orange; font-size: 24px; font-weight: bold;">
-                            Approve with Review
-                        </a>
-                        <a href="{{$notApproveLink}}" target="_blank" value="not approve" style="text-decoration: none; color: red; font-size: 24px; font-weight: bold; margin-left: 20px;">
-                            Not Approve
-                        </a>
-                    </th>
+                    <th>Approved by,</th>
+                    <td></td>
                 </tr>
+                @foreach($form->approvedDetail as $index => $approvedDetail)
+                <tr  class="{{ $index % 2 != 0 ? 'tr-odd' : '' }}">
+                    <td>{{ $approvedDetail->approver_name }}</td>
+                    <td>
+                        <p style="{{$approvedDetail->status == 'approve' ? 'color: green;' : ($approvedDetail->status == 'approve with review' ? 'color: orange;' : 'color: red;')}}">{{ $approvedDetail->status }} {{$approvedDetail->approved_date !== null ? '('.$approvedDetail->approved_date.')' : ''}}</p>
+                        <p>{{$approvedDetail->comment}}</p>
+                    </td>
+                </tr>
+                @endforeach
 
                 <tr>
                     <td colspan="2">
-                        <p style="text-align: center;">Kindly approve it at your earliest convenience so we can proceed.</p>
-                        <p style="text-align: center;">Thank you for your attention.</p>
+                        @if($form->status == 'Approved')
+                            <p style="text-align: center;">Thank you for your cooperation, and we wish you a safe and successful completion of your tasks.</p>
+                        @elseif($form->status == 'Rejected')
+                            <p style="text-align: center;">We appreciate your understanding and look forward to your revised submission.</p>
+                        @endif
                         <br>
                         <p style="text-align: center;">Best regards,</p>
                         <p style="text-align: center;">PT Sinar Meadow International Indonesia</p>

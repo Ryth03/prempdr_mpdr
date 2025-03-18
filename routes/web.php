@@ -13,7 +13,6 @@ use App\Http\Controllers\Master\PositionController;
 use App\Http\Controllers\Master\RoleController;
 use App\Http\Controllers\Master\SectionController;
 use App\Http\Controllers\Master\UserController;
-use App\Http\Controllers\Master\IdeaCountsController;
 use App\Http\Controllers\Mpdr\MpdrController;
 use App\Http\Controllers\Mpdr\MpdrApprovalController;
 use App\Http\Controllers\Mpdr\MpdrInitiatorController;
@@ -25,7 +24,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
 use App\Http\Controllers\Master\LogController;
-use App\Models\PREMPDR\PreMpdrForm;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -120,24 +118,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/mail-approve-with-review', [PreMpdrApprovalController::class, 'approveWithReview'])->name('prempdr.approveWithReview');
         Route::get('/mail-not-approve', [PreMpdrApprovalController::class, 'notApprove'])->name('prempdr.notApprove');
         Route::POST('/mail-comment', [PreMpdrApprovalController::class, 'mailComment'])->name('prempdr.comment');
-        // Route::get('/test2', function (){
-        //     $user = Auth::user();
-        //     $form = PreMpdrForm::where('no', '25PREMPDR0004')->first();
-        //     $approvalNotReviewLink = '';
-        //     $approvalWithReviewLink = '';
-        //     $notApproveLink = '' ;
-        //     $allUser = $form->approvedDetail()->pluck('approver')->toArray();
-        //     $initiator = User::where('nik', $form->approver->initiator)->first();
-        //     $user = User::whereHas('roles', function($query) {
-        //         $query->where('name', 'super-admin');
-        //     })->get();
-        //     $allEmail = $user;
-        //     if($initiator) {
-        //         $allEmail->push($initiator);
-        //     }
-        //     dd($user, $initiator, $allEmail);
-        //     return view('emails.pre-mpdr.sendToUser', compact('form', 'user', 'approvalNotReviewLink', 'approvalWithReviewLink', 'notApproveLink'));
-        // });
     });
 
 
@@ -177,6 +157,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/approval-form-{no_reg}', [MpdrApprovalController::class, 'viewApprovalForm'])->name('mpdr.approval.form.view');
         Route::get('/approval', [MpdrApprovalController::class, 'approval'])->name('mpdr.approval');
         Route::get('/approver', [MpdrApprovalController::class, 'approver'])->name('mpdr.approver');
+
+        Route::get('/mail-approve', [MpdrApprovalController::class, 'approveNotReview'])->name('mpdr.approveNotReview');
+        Route::get('/mail-approve-with-review', [MpdrApprovalController::class, 'approveWithReview'])->name('mpdr.approveWithReview');
+        Route::get('/mail-not-approve', [MpdrApprovalController::class, 'notApprove'])->name('mpdr.notApprove');
+        Route::POST('/mail-comment', [MpdrApprovalController::class, 'mailComment'])->name('mpdr.comment');
     });
 
 

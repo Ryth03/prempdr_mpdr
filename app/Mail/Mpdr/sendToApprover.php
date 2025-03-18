@@ -13,41 +13,34 @@ class sendToApprover extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct()
+    protected $user;
+    protected $form;
+    protected $approvalNotReviewLink;
+    protected $approvalWithReviewLink;
+    protected $notApproveLink;
+    
+    public function __construct($user, $form, $approvalNotReviewLink, $approvalWithReviewLink, $notApproveLink)
     {
-        //
+        $this->user = $user;
+        $this->form = $form;
+        $this->approvalNotReviewLink = $approvalNotReviewLink;
+        $this->approvalWithReviewLink = $approvalWithReviewLink;
+        $this->notApproveLink = $notApproveLink;
     }
 
-    /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'Send To Approval',
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'view.name',
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
+    
+    public function build(){
+        // dd("ini di mail: ", $this->user, $this->form, $this->approvalNotReviewLink, $this->approvalWithReviewLink, $this->notApproveLink);
+        
+        return $this->from(config('mail.from.address'), 'MPDR SMII')
+                    ->view('emails.mpdr.sendToApprover')
+                    ->subject("Form ". $this->form->no ." needs your approval.")
+                    ->with([
+                        'user' => $this->user,
+                        'form' => $this->form,
+                        'approvalNotReviewLink' => $this->approvalNotReviewLink,
+                        'approvalWithReviewLink' => $this->approvalWithReviewLink,
+                        'notApproveLink' => $this->notApproveLink
+                    ]);
     }
 }

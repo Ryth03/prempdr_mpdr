@@ -29,14 +29,14 @@
             <tr>
                 <td colspan="2">
                     <p>Dear <strong>{{$user->name}}</strong>,</p>
-                    <p>A new Pre-MPDR request is submitted for your review and approval. Please review the details below:</p>
+                    <p>A new MPDR request is submitted for your review and approval. Please review the details below:</p>
                 </td>
             </tr>
         </thead>
         <tbody>
                 <tr>
                     <th colspan="2">
-                        <h5 class="text-center">Pre-MARKETING PRODUCT DEVELOPMENT REQUEST</h5>
+                        <h5 class="text-center">MARKETING PRODUCT DEVELOPMENT REQUEST</h5>
                     </th>
                 </tr>
             
@@ -45,16 +45,16 @@
                     <td width="60">{{$form->no}}</td>
                 </tr>
                 <tr>
-                    <td>Project Name:</td>
-                    <td>{{$form->project_name ?? ''}}</td>
+                    <td>Product Name:</td>
+                    <td>{{$form->product_name ?? ''}}</td>
                 </tr>
                 <tr class="tr-odd">
                     <td>Level Priority:</td>
                     <td>{{$form->level_priority ?? ''}}</td>
                 </tr>
                 <tr>
-                    <td>Proposed BRAND Name:</td>
-                    <td>{{$form->brand_name ?? ''}}</td>
+                    <td>Initiator:</td>
+                    <td>{{$form->initiator ?? ''}}</td>
                 </tr>
                 <tr class="tr-odd">
                     <td>Rational For Development:</td>
@@ -62,7 +62,10 @@
                 </tr>
                 <tr>
                     <td>Product Category:</td>
-                    <td>{{$form->category->category ?? ''}} {{$form->category->other ?? ''}}</td>
+                    <td>
+                        <p>{{$form->category->category ?? ''}}</p>
+                        <p>{{$form->category->other ?? ''}}</p>
+                    </td>
                 </tr>
                 <tr class="tr-odd">
                     <td>Channel:</td>
@@ -94,7 +97,7 @@
                 <tr class="tr-odd">
                     <td>Certification Requirement:</td>
                     <td>
-                        <p>{{ $form->certification->category ?? '' }}</p>
+                        <p>{{ $form->certification->category ?? '' }}</p> 
                         <p>{{ $form->certification->other ?? '' }}</p>
                     </td>
                 </tr>
@@ -133,7 +136,7 @@
                 <tr class="tr-odd">
                     <td>Packaging:</td>
                     <td>
-                        <p>{{ $form->packaging->category ?? '' }}</p>
+                        <p>{{ $form->packaging->category ?? '' }} </p>
                         <p>{{ $form->packaging->detail ?? '' }}</p>
                     </td>
                 </tr>

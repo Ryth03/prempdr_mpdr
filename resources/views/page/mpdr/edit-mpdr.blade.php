@@ -180,7 +180,7 @@
                     <label class="form-label">Certification Requirement:</label>
                     <div class="">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certification" id="BPMO" value="BPOM" required>
+                            <input class="form-check-input" type="radio" name="certification" id="BPOM" value="BPOM" required>
                             <label class="form-check-label" for="certification1">
                             BPOM
                             </label>
