@@ -115,14 +115,6 @@
                     <span class="hide-menu">Pre MPDR</span>
                 </li>
                 <li class="sidebar-item">
-                    <a class="sidebar-link" href="{{ route('prempdr.template') }}" aria-expanded="false">
-                        <span>
-                            <i class="ti ti-list-details"></i>
-                        </span>
-                        <span class="hide-menu">Template Pre MPDR</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
                     <a class="sidebar-link" href="{{ route('prempdr.index') }}" aria-expanded="false">
                         <span>
                             <i class="ti ti-list-details"></i>

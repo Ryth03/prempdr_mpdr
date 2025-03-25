@@ -2,9 +2,6 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Dashboard;
-use App\Http\Controllers\IdeaApprovalController;
-use App\Http\Controllers\IdeaController;
-use App\Http\Controllers\Master\ApproverController;
 use App\Http\Controllers\Master\CategoryController;
 use App\Http\Controllers\Master\DepartmentController;
 use App\Http\Controllers\Master\LevelController;
@@ -20,12 +17,9 @@ use App\Http\Controllers\PreMpdr\PreMpdrController;
 use App\Http\Controllers\PreMpdr\PreMpdrApprovalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Rs\RequistionSlipController;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
 use App\Http\Controllers\Master\LogController;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +53,14 @@ Route::get('/create-symlink', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [Dashboard::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/getPreMpdrTotal', [Dashboard::class, 'getPreMpdrTotal'])->name('dashboard.prempdr.total');
+    Route::get('/dashboard/getMpdrTotal', [Dashboard::class, 'getMpdrTotal'])->name('dashboard.mpdr.total');
+    Route::get('/dashboard/getPreMpdrPending', [Dashboard::class, 'getPreMpdrPending'])->name('dashboard.prempdr.pending');
+    Route::get('/dashboard/getMpdrPending', [Dashboard::class, 'getMpdrPending'])->name('dashboard.mpdr.pending');
+    Route::get('/dashboard/getPreMpdrYear', [Dashboard::class, 'getPreMpdrYear'])->name('dashboard.prempdr.year');
+    Route::get('/dashboard/getMpdrYear', [Dashboard::class, 'getMpdrYear'])->name('dashboard.mpdr.year');
+    Route::get('/dashboard/getPreMpdrChart', [Dashboard::class, 'getPreMpdrChart'])->name('dashboard.prempdr.chart');
+    Route::get('/dashboard/getMpdrChart', [Dashboard::class, 'getMpdrChart'])->name('dashboard.mpdr.chart');
 
 
 
@@ -99,7 +101,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/print-{no_reg}', [PreMpdrController::class, 'print'])->name('prempdr.print');
         Route::get('/form-{no_reg}', [PreMpdrController::class, 'show'])->name('prempdr.form');
 
-        Route::get('/template', [PreMpdrController::class, 'template'])->name('prempdr.template');
         Route::get('/no_reg', [PreMpdrController::class, 'noReg'])->name('prempdr.noReg');
 
         Route::get('/getFormList', [PreMpdrController::class, 'getFormList'])->name('prempdr.form.list');
@@ -137,7 +138,6 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/no_reg', [MpdrController::class, 'noReg'])->name('mpdr.noReg');
 
-        Route::get('/template', [MpdrController::class, 'template'])->name('mpdr.template');
         Route::get('/getFormList', [MpdrController::class, 'getFormList'])->name('mpdr.form.list');
         Route::get('/getFormData', [MpdrController::class, 'getFormData'])->name('mpdr.form.data');
         Route::get('/getReportData', [MpdrController::class, 'getReportData'])->name('mpdr.report.data');

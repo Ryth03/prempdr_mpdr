@@ -11,7 +11,7 @@ use Spatie\Activitylog\Models\Activity;
 class LogController extends Controller
 {
     public function getLogsData(Request $request){
-        $logs = Activity::where('log_name', $request->input('form'))
+        $logs = Activity::with('user')->where('log_name', $request->input('form'))
         ->get();
         if($logs){
             return response()->json($logs);
