@@ -455,7 +455,13 @@ class MpdrController extends Controller
 
     public function getFormList()
     {
-        $forms = MpdrForm::where('user_id', Auth::user()->id)->get();
+        $user = Auth::user();
+        $forms = null;
+        if($user->hasRole('super-admin')){
+            $forms = MpdrForm::all();
+        }else{
+            $forms = MpdrForm::where('user_id', Auth::user()->id)->get();
+        }
         if($forms){
             return response()->json($forms);
         }

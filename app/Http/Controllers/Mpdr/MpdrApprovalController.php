@@ -211,7 +211,7 @@ class MpdrApprovalController extends Controller
                     foreach($form->approvedDetail as $detail){
                         if($detail->approver_nik === $nik){
                             // Jika status vacant maka tidak bisa approve
-                            if($detail->status === 'vacant'){
+                            if($detail->status === 'Vacant'){
                                 DB::rollback();
                                 Alert::toast("User status is vacant.", 'error');
                                 return back();
@@ -236,7 +236,7 @@ class MpdrApprovalController extends Controller
                     if($user->hasRole('gm'))
                     {
                         foreach($form->approvedDetail as $detail){
-                            if($detail->status === 'vacant'){
+                            if($detail->status === 'Vacant' || $detail->status === 'pending'){
                                 $detail->approved_date = now();
                                 if($request->input('action') === 'approve' || $request->input('action') === 'approve with review'){
                                     $detail->status = 'approve with review';
@@ -388,6 +388,33 @@ class MpdrApprovalController extends Controller
         }
     }
 
+    public function sendMailToGMUrgent($no_reg)
+    {
+        $form = MpdrForm::with('revision', 'detail', 'category', 'channel', 'description', 'certification', 'competitor', 'packaging', 'market', 'approvedDetail', 'initiatorDetail')
+        ->where('no', $no_reg)->first();
+
+        if($form->status == 'In Approval') // cek jika status masih In Approval
+        {
+            foreach($form->approvedDetail as $detail){
+                $user = User::where('nik', $detail->approver_nik)->first();
+                if ($user->hasRole('gm'))
+                {
+                    $gm = $user;
+                    $gm_detail = $detail;
+                    if($detail->status !== 'pending' && $detail->token == null ) // Cek jika gm sudah approve dan token null
+                    {
+                        $approveStatus = False;
+                        break;
+                    }
+                    ProcessApproval::dispatch($gm, $form, $gm_detail);
+                    Alert::toast('Form ' . $no_reg . ' Email successfully send!', 'success');
+                    break; 
+                }
+            }
+        }
+        return redirect()->route('mpdr.index');
+    }
+
     private function checkFormInApprovalStatus($no_reg)
     {
         $form = MpdrForm::with('approvedDetail')
@@ -487,7 +514,7 @@ class MpdrApprovalController extends Controller
                     if($approver->hasRole('gm'))
                     {
                         foreach($form->approvedDetail as $detail){
-                            if($detail->status === 'Vacant'){
+                            if($detail->status === 'Vacant' || $detail->status === 'pending'){
                                 $detail->approved_date = now();
                                 if($status === 'approve' || $status === 'approve with review'){
                                     $detail->status = 'approve with review';
@@ -608,7 +635,24 @@ class MpdrApprovalController extends Controller
                         ->causedBy($approver)
                         ->withProperties(['no' => $form_no, 'action' => 'approve'])
                         ->log('Approve Mpdr Form ' . $form_no . ' by ' . $approver->name . ' at ' . now());
-                        
+                    
+                    if($approver->hasRole('gm'))
+                    {
+                        foreach($form->approvedDetail as $detail){
+                            if($detail->status === 'Vacant' || $detail->status === 'pending'){
+                                $detail->approved_date = now();
+                                if($status === 'approve' || $status === 'approve with review'){
+                                    $detail->status = 'approve with review';
+                                    $detail->comment = "Approve by GM";
+                                }else if($status === 'not approve'){
+                                    $detail->status = $status;
+                                    $detail->comment = "Not approve by GM";
+                                }
+                                $detail->token = null;
+                                $detail->save();
+                            }
+                        }
+                    }
                 }else{
                     
                     DB::rollback();

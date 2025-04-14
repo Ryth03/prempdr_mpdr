@@ -15,6 +15,7 @@ use App\Models\MPDR\MpdrMarketUpdate;
 use App\Models\MPDR\MpdrApprovedDetail;
 use App\Models\MPDR\MpdrRevision;
 use App\Models\MPDR\MpdrInitiatorApprovedDetail;
+use App\Models\User;
 
 class MpdrForm extends Model
 {
@@ -30,6 +31,12 @@ class MpdrForm extends Model
         'status'
     ];
     
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function revision()
     {
         return $this->belongsTo(MpdrRevision::class);

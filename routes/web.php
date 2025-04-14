@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard/getMpdrTotal', [Dashboard::class, 'getMpdrTotal'])->name('dashboard.mpdr.total');
     Route::get('/dashboard/getPreMpdrPending', [Dashboard::class, 'getPreMpdrPending'])->name('dashboard.prempdr.pending');
     Route::get('/dashboard/getMpdrPending', [Dashboard::class, 'getMpdrPending'])->name('dashboard.mpdr.pending');
+    Route::get('/dashboard/getDashboardLogs', [Dashboard::class, 'getDashboardLogs'])->name('dashboard.logs');
     Route::get('/dashboard/getPreMpdrYear', [Dashboard::class, 'getPreMpdrYear'])->name('dashboard.prempdr.year');
     Route::get('/dashboard/getMpdrYear', [Dashboard::class, 'getMpdrYear'])->name('dashboard.mpdr.year');
     Route::get('/dashboard/getPreMpdrChart', [Dashboard::class, 'getPreMpdrChart'])->name('dashboard.prempdr.chart');
@@ -162,6 +163,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/mail-approve-with-review', [MpdrApprovalController::class, 'approveWithReview'])->name('mpdr.approveWithReview');
         Route::get('/mail-not-approve', [MpdrApprovalController::class, 'notApprove'])->name('mpdr.notApprove');
         Route::POST('/mail-comment', [MpdrApprovalController::class, 'mailComment'])->name('mpdr.comment');
+        
+        Route::POST('/sendMailToGMUrgent/{no_reg}', [MpdrApprovalController::class, 'sendMailToGMUrgent'])->name('mpdr.send.mail.gm');
     });
 
 

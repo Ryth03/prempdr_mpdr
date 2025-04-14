@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Spatie\Activitylog\Models\Activity;
 
 class Dashboard extends Controller
 {
@@ -35,10 +36,33 @@ class Dashboard extends Controller
         return response()->json($pending);
     }
 
-    public function getMpdrPending()
+    public function getMpdrPending(Request $request)
     {
         $pending = MpdrForm::where('status', 'In Approval')->pluck('no');
         return response()->json($pending);
+    }
+
+    public function getDashboardLogs(Request $request)
+    {   
+        $query = Activity::with('user')->where('log_name', $request->formType)
+        ->orderBy('created_at', 'desc');
+        if($request->form == 'all')
+        {
+            $logs = $query->get();
+            if($logs){
+                return response()->json($logs);
+            }
+        }
+        else
+        {
+            $logs = $query->whereJsonContains('properties->no', $request->form)
+                    ->get();
+            if($logs){
+                return response()->json($logs);
+            }
+        }
+
+        return response()->json("Tidak ada Log");
     }
 
     public function getPreMpdrYear()
@@ -110,7 +134,8 @@ class Dashboard extends Controller
         return response()->json($year);
     }
 
-    public function getMpdrChart(Request $request){
+    public function getMpdrChart(Request $request)
+    {
         // Ambil data berdasarkan tahun yang dipilih
         $year = $request->selectedYear;
         

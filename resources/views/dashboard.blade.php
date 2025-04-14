@@ -5,7 +5,14 @@
 
     @push('css')
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.35.3/dist/apexcharts.min.css">
-        
+        <style>
+          .text-custom-orange{
+            color: orange;
+          }
+          .text-custom-orange:hover{
+            color: blue;
+          }
+        </style>
     @endpush
 
     <!-- Breadcrumb -->
@@ -72,28 +79,44 @@
       
       {{-- Pre mpdr & mpdr logs --}}
       <div class="row">
-        {{-- Pre Mpdr --}}
+        {{-- Pre Mpdr Logs--}}
         <div class="col-md-6 col-lg-4 order-md-0 order-0 d-flex align-items-stretch">
           <div class="card w-100">
             <div class="card-body">
-              <div class="mb-4">
-                <h4 class="card-title fw-semibold">Recent Pre-MPDR Logs</h4>
-                <p class="card-subtitle">Track Recent Pre-MPDR Activity Logs</p>
+              <div class="d-sm-flex d-block align-items-center justify-content-between mb-3">
+                <div class="mb-4">
+                  <h4 class="card-title fw-semibold">Pre-MPDR Logs</h4>
+                  <p class="card-subtitle">Track Recent Pre-MPDR Activity Logs</p>
+                </div>
+                <div>
+                  <select class="form-select fw-semibold" id="prempdr-select-logs">
+                    <option value="" disabled>Select Form</option>
+                    <option value="all" selected>All</option>
+                  </select>
+                </div>
               </div>
-              <ul class="timeline-widget mb-0 position-relative mb-n4" id="prempdr-logs">
+              <ul id="prempdr-logs" class="timeline-widget mb-0 position-relative mb-n4 overflow-y-scroll" style="height: 300px;">
               </ul>
             </div>
           </div>
         </div>
-        {{-- Mpdr --}}
+        {{-- Mpdr Logs --}}
         <div class="col-md-6 col-lg-4 order-lg-2 order-1 d-flex align-items-stretch">
           <div class="card w-100">
             <div class="card-body">
-              <div class="mb-4">
-                <h4 class="card-title fw-semibold">Recent MPDR Logs</h4>
-                <p class="card-subtitle">Track Recent MPDR Activity Logs</p>
+              <div class="d-sm-flex d-block align-items-center justify-content-between mb-3">
+                <div class="mb-4">
+                  <h4 class="card-title fw-semibold">MPDR Logs</h4>
+                  <p class="card-subtitle">Track Recent MPDR Activity Logs</p>
+                </div>
+                <div>
+                  <select class="form-select fw-semibold" id="mpdr-select-logs">
+                    <option value="" disabled>Select Form</option>
+                    <option value="all" selected>All</option>
+                  </select>
+                </div>
               </div>
-              <ul class="timeline-widget mb-0 position-relative mb-n4" id="mpdr-logs">
+              <ul id="mpdr-logs" class="timeline-widget mb-0 position-relative mb-n4 overflow-y-scroll" style="height: 300px;">
               </ul>
             </div>
           </div>
@@ -184,17 +207,28 @@
               ul.classList.add('text-warning');
               // Iterasi melalui response dan buat elemen <li> untuk setiap item
               response.forEach(function(item) {
+                  const route = "{{ route('prempdr.form', ':formId') }}".replace(':formId', item);
                   var li = document.createElement('li'); // Membuat elemen <li>
-                  li.innerText = item; // Menambahkan teks ke dalam <li>
+                  li.innerHTML= `<a href="${route}" class="text-custom-orange">${item}</a>`; // Menambahkan teks ke dalam <li>
                   ul.appendChild(li); // Menambahkan <li> ke dalam <ul>
+
+                  // Menambahkan ke dropdown prempdr logs
+                  var selectLogs = document.getElementById('prempdr-select-logs');
+                  var option = document.createElement('option');
+                  option.value = item;  
+                  option.textContent = item;  
+                  selectLogs.appendChild(option);  
               });
 
               // Menambahkan <ul> ke dalam div totalDiv
               totalDiv.innerHTML = ''; // Membersihkan konten sebelumnya di totalDiv
               totalDiv.appendChild(ul); // Menambahkan <ul> yang berisi <li> ke dalam div
             }else{
-              totalDiv.innerHTML = `<span class="text-warning">None</span>`;
+              totalDiv.innerHTML = `<span class="text-dark">None</span>`;
             }
+
+            //Menjalankan fungsi logs
+            changeLogs('prempdr');
           },
           error: function() {
               // Jika gagal, tampilkan pesan error
@@ -213,17 +247,28 @@
               ul.classList.add('text-warning');
               // Iterasi melalui response dan buat elemen <li> untuk setiap item
               response.forEach(function(item) {
+                  const route = "{{ route('mpdr.form', ':formId') }}".replace(':formId', item);
                   var li = document.createElement('li'); // Membuat elemen <li>
-                  li.innerText = item; // Menambahkan teks ke dalam <li>
+                  li.innerHTML= `<a href="${route}" class="text-custom-orange">${item}</a>`; // Menambahkan teks ke dalam <li>
                   ul.appendChild(li); // Menambahkan <li> ke dalam <ul>
+
+                  // Menambahkan ke dropdown mpdr logs
+                  var selectLogs = document.getElementById('mpdr-select-logs');
+                  var option = document.createElement('option');
+                  option.value = item;  
+                  option.textContent = item;  
+                  selectLogs.appendChild(option); 
               });
 
               // Menambahkan <ul> ke dalam div totalDiv
               totalDiv.innerHTML = ''; // Membersihkan konten sebelumnya di totalDiv
               totalDiv.appendChild(ul); // Menambahkan <ul> yang berisi <li> ke dalam div
             }else{
-              totalDiv.innerHTML = `<span class="text-warning">None</span>`;
+              totalDiv.innerHTML = `<span class="text-dark">None</span>`;
             }
+            
+            //Menjalankan fungsi logs
+            changeLogs('mpdr');
           },
           error: function() {
               // Jika gagal, tampilkan pesan error
@@ -232,108 +277,79 @@
           }
         });
 
-        // get prempdr logs data
-        $.ajax({
-            url: '{{ route('logs.data') }}', // URL ke controller
-            method: 'GET',
-            data: {
-                form: 'prempdr'
-            },
-            success: function(response) {
-                var logs = document.getElementById('prempdr-logs');
-                logs.innerHTML = '';
-                for (var i = response.length - 1; i >= response.length - 5; i--) {
-                  var log = response[i];
-                  var date = new Date(log.created_at)
-                  var formattedDay = date.toLocaleDateString('id-ID', {
-                      month: 'short',      // Nama bulan (contoh: Januari, Februari, dll)
-                      day: 'numeric',     // Tanggal (contoh: 19)
-                  });
-                  var formattedTime = date.toLocaleTimeString('id-ID', {
-                      hour: 'numeric',    // Jam
-                      minute: 'numeric',  // Menit
-                      hour12: false       // Format waktu 24 jam
-                  });
-                  var action = log.properties.action;
-                  var borderColor = action == 'approve' ? 'border-success' : 
-                                    action == 'approve with review' ? 'border-warning' : 
-                                    action == 'not approve' ? 'border-danger' : 
-                                    action == 'created' ? 'border-primary' : 
-                                    action == 'updated' ? 'border-primary-subtle' : 
-                                    action == 'deleted' ? 'border-black' : 
-                                    ''
-                                    ;
-                  var div = `
-                  <li class="timeline-item d-flex position-relative overflow-hidden w-100">
-                    <div class="col-4 timeline-time text-dark flex-shrink-0 text-end">${formattedDay}, ${formattedTime}</div>
-                    <div class="col-1 timeline-badge-wrap d-flex flex-column align-items-center">
-                      <span class="timeline-badge flex-shrink-0 my-8 border-2 border ${borderColor}"></span>
-                      <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                    </div>
-                    <div class="col-7 timeline-desc fs-3 text-dark mt-n1 fw-semibold">${log.properties.no} ${action} by ${response[i].user.name}</div>
-                  </li>
-                  `;
-                  logs.innerHTML += div;
-                }
-                
-            },
-            error: function() {
-                // Jika gagal, tampilkan pesan error
-                console.log('Error ketika mengambil prempdr logs');
-                // $('#formData').html('<p>There was an error fetching the data.</p>');
-            }
+        // Mengubah data logs sesuai yang dipilih
+        document.getElementById('prempdr-select-logs').addEventListener('change', function() {
+            changeLogs('prempdr');
         });
-        // get mpdr logs data
-        $.ajax({
-            url: '{{ route('logs.data') }}', // URL ke controller
-            method: 'GET',
-            data: {
-                form: 'mpdr'
-            },
-            success: function(response) {
-                var logs = document.getElementById('mpdr-logs');
-                logs.innerHTML = '';
-                for (var i = response.length - 1; i >= response.length - 5; i--) {
-                  var log = response[i];
-                  var date = new Date(log.created_at)
-                  var formattedDay = date.toLocaleDateString('id-ID', {
-                      month: 'short',      // Nama bulan (contoh: Januari, Februari, dll)
-                      day: 'numeric',     // Tanggal (contoh: 19)
-                  });
-                  var formattedTime = date.toLocaleTimeString('id-ID', {
-                      hour: 'numeric',    // Jam
-                      minute: 'numeric',  // Menit
-                      hour12: false       // Format waktu 24 jam
-                  });
-                  var action = log.properties.action;
-                  var borderColor = action == 'approve' ? 'border-success' : 
-                                    action == 'approve with review' ? 'border-warning' : 
-                                    action == 'not approve' ? 'border-danger' : 
-                                    action == 'created' ? 'border-primary' : 
-                                    action == 'updated' ? 'border-primary-subtle' : 
-                                    action == 'deleted' ? 'border-black' : 
-                                    ''
-                                    ;
-                  var div = `
-                  <li class="timeline-item d-flex position-relative overflow-hidden w-100">
-                    <div class="col-4 timeline-time text-dark flex-shrink-0 text-end">${formattedDay}, ${formattedTime}</div>
-                    <div class="col-1 timeline-badge-wrap d-flex flex-column align-items-center">
-                      <span class="timeline-badge flex-shrink-0 my-8 border-2 border ${borderColor}"></span>
-                      <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                    </div>
-                    <div class="col-7 timeline-desc fs-3 text-dark mt-n1 fw-semibold">${log.properties.no} ${action} by ${response[i].user.name}</div>
-                  </li>
-                  `;
-                  logs.innerHTML += div;
-                }
-                
-            },
-            error: function() {
-                // Jika gagal, tampilkan pesan error
-                console.log('Error ketika mengambil prempdr logs');
-                // $('#formData').html('<p>There was an error fetching the data.</p>');
-            }
+        document.getElementById('mpdr-select-logs').addEventListener('change', function() {
+            changeLogs('mpdr');
         });
+
+        // Fungsi untuk mengubah logs sesuai dropdown
+        function changeLogs(formType)
+        {
+          // ambil value dari select
+          var selectForm = document.getElementById(`${formType}-select-logs`).value;
+          console.log(selectForm);
+          // get logs data
+          $.ajax({
+              url: '{{ route('dashboard.logs') }}', // URL ke controller
+              method: 'GET',
+              data: {
+                  formType: formType,
+                  form: selectForm
+              },
+              success: function(response) {
+                  console.log(response);
+                  var logs = document.getElementById(`${formType}-logs`);
+                  logs.innerHTML = '';
+                  if(response.length > 0)
+                  {
+                    response.forEach(item => {
+                      var log = item;
+                      var date = new Date(log.created_at)
+                      var formattedDay = date.toLocaleDateString('id-ID', {
+                          month: 'short',      // Nama bulan (contoh: Januari, Februari, dll)
+                          day: 'numeric',     // Tanggal (contoh: 19)
+                      });
+                      var formattedTime = date.toLocaleTimeString('id-ID', {
+                          hour: 'numeric',    // Jam
+                          minute: 'numeric',  // Menit
+                          hour12: false       // Format waktu 24 jam
+                      });
+                      var action = log.properties.action;
+                      var borderColor = action == 'approve' ? 'border-success' : 
+                                        action == 'approve with review' ? 'border-warning' : 
+                                        action == 'not approve' ? 'border-danger' : 
+                                        action == 'created' ? 'border-primary' : 
+                                        action == 'updated' ? 'border-primary-subtle' : 
+                                        action == 'deleted' ? 'border-black' : 
+                                        ''
+                                        ;
+                      var div = `
+                      <li class="timeline-item d-flex position-relative overflow-hidden w-100">
+                        <div class="col-4 timeline-time text-dark flex-shrink-0 text-end">${formattedDay}, ${formattedTime}</div>
+                        <div class="col-1 timeline-badge-wrap d-flex flex-column align-items-center">
+                          <span class="timeline-badge flex-shrink-0 my-8 border-2 border ${borderColor}"></span>
+                          <span class="timeline-badge-border d-block flex-shrink-0"></span>
+                        </div>
+                        <div class="col-7 timeline-desc fs-3 text-dark mt-n1 fw-semibold">${log.properties.no} ${action} by ${item.user.name}</div>
+                      </li>
+                      `;
+                      logs.innerHTML += div;
+                    });
+                  }
+                  
+                  
+              },
+              error: function() {
+                  // Jika gagal, tampilkan pesan error
+                  console.log('Error ketika mengambil prempdr logs');
+                  // $('#formData').html('<p>There was an error fetching the data.</p>');
+              }
+          });
+        }
+        
 
         // get PreMpdr Year
         $.ajax({

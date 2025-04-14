@@ -112,7 +112,28 @@
                         } else {
                             const route = "{{ route('mpdr.form', ':formId') }}";
                             const url = route.replace(':formId', row.no);
-                            return `<a href="${url}" class="btn btn-outline-primary" >View Form</a>`;
+                            @if(auth()->user()->hasRole('super-admin'))
+
+                            if(data.status === 'In Approval')
+                            {
+                                const sendEmailUrl = "{{ route('mpdr.send.mail.gm', ':formId') }}".replace(':formId', row.no);
+                                return `<div class="d-flex gap-6">
+                                            <a href="${url}" class="btn btn-outline-primary me-2">View Form</a>
+                                            <form id="send-form-${row.no}" action="${sendEmailUrl}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="_method" value="POST">
+                                                <a href="javascript:void(0)" class="btn btn-outline-warning" send-form-no="${row.no}" onClick="confirmEmail(this)">
+                                                    Send Email To GM
+                                                </a>
+                                            </form>
+                                        </div>
+                                        `;
+                            }
+
+                            @endif
+                            
+                            return `<a href="${url}" class="btn btn-outline-primary">View Form</a>`;
                         }
                     }
                 }
@@ -133,6 +154,24 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.getElementById('delete-form-' + formNo).submit();
+                }
+            });
+        }
+
+        // Function untuk konfirmasi send email to gm
+        function confirmEmail(button){
+            var formNo = button.getAttribute('send-form-no');
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Email will be send to GM!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, send to GM!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('send-form-' + formNo).submit();
                 }
             });
         }
