@@ -64,19 +64,33 @@
                                 <div class="message-body" data-simplebar="">
 
                                     @foreach (auth()->user()->unreadNotifications as $notification)
+                                    @php
+                                        $type = $notification->data['data']['notification_type'] ?? '';
+                                        $title = $notification->data['data']['title'] ?? '';
+
+                                        $urlType = null;
+                                        $urlContent = null;
+
+                                        if (str_contains($title, 'Pre-MPDR')) {
+                                            $urlType = 'prempdr';
+                                        } elseif (str_contains($title, 'MPDR')) {
+                                            $urlType = 'mpdr';
+                                        } 
+                                        if ($type === 'approval_request') {
+                                            $urlContent = 'approval';
+                                        } elseif ($type === 'rejected' || $type === 'approved') {
+                                            $urlContent = 'index';
+                                        }
+
+                                        $url = $urlType . '.' . $urlContent;
+                                    @endphp
                                     <button type="button"
                                         class="p-3 d-flex align-items-center dropdown-item gap-3 border-bottom mark-as-read"
                                         data-id="{{ $notification->id }}"
-                                        @if (in_array($notification->data['data']['notification_type'] ?? '', [
-                                                'approval_request',
-                                                'approved',
-                                                'liked',
-                                                'rejected',
-                                            ])) data-url="{{ $notification->data['data']['notification_type'] === 'approval_request'
-                                                ? route('ideas.approvals')
-                                                : ($notification->data['data']['notification_type'] === 'rejected'
-                                                    ? route('ideas.my')
-                                                    : route('ideas.index')) }}"
+                                        @if (!is_null($urlType) || !is_null($urlContent)) 
+                                            data-url="{{ route($url) }}"
+                                        @else
+                                            data-url="{{ route('dashboard') }}"
                                         @endif>
                                         <span
                                             class="flex-shrink-0 bg-primary-subtle rounded-circle round-40 d-flex align-items-center justify-content-center fs-6 text-primary">

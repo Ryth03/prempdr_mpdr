@@ -359,8 +359,60 @@
             });
         }
 
+        // fungsi untuk radiotext menjadi readonly jika radio tidak dipilih
+        function radiosOnChanges() {
+            // mengatur readonly text pada input product category
+            $('input[name="productCategory"]').on('change', function () {
+                const productCategoryText = $('#productCategoryText');
+
+                if ($(this).is(':checked') && $(this).val() === 'Others') {
+                    productCategoryText.removeAttr('readonly');
+                } else {
+                    productCategoryText.attr('readonly', true).val('');
+                }
+            });
+
+            // Mengatur readonly text pada input channel
+            $('input[name="channel"]').on('change', function () {
+                const channelText = $('#country');
+                if ($(this).is(':checked') && $(this).val() === 'International') {
+                    channelText.removeAttr('readonly');
+                } else {
+                    channelText.attr('readonly', true).val('');
+                }
+            });
+
+            // mengatur readonly text pada input certification
+            $('input[name="certification"]').on('change', function () {
+                const certificationText = $('#certificationText');
+
+                if ($(this).is(':checked') && $(this).val() === 'Others') {
+                    certificationText.removeAttr('readonly');
+                } else {
+                    certificationText.attr('readonly', true).val('');
+                }
+            });
+
+
+            // mengatur readonly text pada input packaging
+            $('input[name="packaging"]').on('change', function () {
+                const existingPackagingText = $('#ExistingPackagingText');
+                const newPackagingText = $('#NewPackagingText');
+
+                if ($(this).is(':checked') && $(this).val() === 'Existing') {
+                    existingPackagingText.removeAttr('readonly');
+                    newPackagingText.attr('readonly', true).val('');
+                } else {
+                    newPackagingText.removeAttr('readonly');
+                    existingPackagingText.attr('readonly', true).val('');
+                }
+            });
+
+        };
+        radiosOnChanges();
+
         // Ketika html sudah dimuat
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
 
             // mengambil list approver
             $.ajax({
@@ -421,10 +473,11 @@
                     $('#rationalForDevelopment').text(response.detail.rational_for_development);
                     $('#targetLaunch').val(response.detail.target_launch);
 
-                    $(`[id="${response.category.category}"]`).attr('checked', true).attr('disabled', false);
+                    $(`[id="${response.category.category}"]`).prop('checked', true).prop('disabled', false).trigger('change');
+                    console.log('Trigger dijalankan untuk ID:', response.category.category);
                     $('#productCategoryText').val(response.category.other);
 
-                    $(`#${response.channel.category}`).prop('checked', true).prop('disabled', false);
+                    $(`#${response.channel.category}`).prop('checked', true).prop('disabled', false).trigger('change');
                     $('#country').val(response.channel.country);
 
                     $('#productDescription').text(response.description.product_description);
@@ -433,7 +486,7 @@
                     $('#deliveryTemperature').val(response.description.delivery_temperature);
                     
                     var category = response.certification.category === 'Others' ? 'certificationOthers' : response.certification.category;
-                    $(`#${category}`).prop('checked', true).prop('disabled', false);
+                    $(`#${category}`).prop('checked', true).prop('disabled', false).trigger('change');
                     $('#certificationText').val(response.certification.other);
 
                     // Competitor's Product
@@ -446,7 +499,7 @@
 
                     // Detailed Packaging
                     $('#weightProduct').val(response.packaging.weight);
-                    $(`#${response.packaging.category}Packaging`).prop('checked', true).prop('disabled', false);
+                    $(`#${response.packaging.category}Packaging`).prop('checked', true).prop('disabled', false).trigger('change');
                     $(`#${response.packaging.category}PackagingText`).val(response.packaging.detail);
                     $('#productVariation').val(response.packaging.product_variation);
 
@@ -459,6 +512,7 @@
                     $('#salesManager').val(form.approver.sales_manager);
                     $('#marketingManager').val(form.approver.marketing_manager);
                     $('#deptHead').val(form.approver.department_head);
+        
                 },
                 error: function() {
                     // Jika gagal, tampilkan pesan error
@@ -470,6 +524,10 @@
 
             
         });
+
+
+
+        
     </script>
 @endpush
 

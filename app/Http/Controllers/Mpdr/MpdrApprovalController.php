@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\MPDR\MpdrForm;
 use App\Models\MPDR\MpdrApprover;
+use App\Notifications\MpdrNotification;
 
 class MpdrApprovalController extends Controller
 {
@@ -307,6 +308,15 @@ class MpdrApprovalController extends Controller
                 $user = User::where('nik', $detail->approver_nik)->first(); 
                 if(!$user->hasRole('gm') && $detail->status == 'pending'){
                     ProcessApproval::dispatch($user, $form, $detail); 
+            
+                    // kirim notif app 
+                    $data = [
+                        'title' => 'New MPDR for Approval',
+                        'message' => $form->no . ' needs your approval.',
+                        'user_id' => $form->user_id,
+                    ];
+                    $notificationType = 'approval_request'; // Tipe notifikasi yang sesuai
+                    $user->notify(new MpdrNotification($data, $notificationType));
                 }
             }
         }
@@ -328,6 +338,15 @@ class MpdrApprovalController extends Controller
 
             foreach($allUser as $user){ // Foreach semua user
                 sendResultToUser::dispatch($user,  $form); // send email
+            
+                // kirim notif app 
+                $data = [
+                    'title' => 'MPDR approved',
+                    'message' => $form->no . ' has been approved.',
+                    'user_id' => $form->user_id,
+                ];
+                $notificationType = 'approved'; // Tipe notifikasi yang sesuai
+                $user->notify(new MpdrNotification($data, $notificationType));
             }
         }
         else if($form->status == 'Rejected') // Kirim ke initiator dan admin jika form status rejected
@@ -341,6 +360,15 @@ class MpdrApprovalController extends Controller
             //foreach initiator dan admin
             foreach($allUser as $user){
                 sendResultToUser::dispatch($user, $form); // send email
+            
+                // kirim notif app 
+                $data = [
+                    'title' => 'MPDR rejected',
+                    'message' => $form->no . ' has been rejected.',
+                    'user_id' => $form->user_id,
+                ];
+                $notificationType = 'rejected'; // Tipe notifikasi yang sesuai
+                $user->notify(new MpdrNotification($data, $notificationType));
             }
 
         }
@@ -384,6 +412,15 @@ class MpdrApprovalController extends Controller
 
             if($approveStatus){
                 ProcessApproval::dispatch($gm, $form, $gm_detail); 
+            
+                // kirim notif app 
+                $data = [
+                    'title' => 'New MPDR for Approval',
+                    'message' => $form->no . ' needs your approval.',
+                    'user_id' => $form->user_id,
+                ];
+                $notificationType = 'approval_request'; // Tipe notifikasi yang sesuai
+                $gm->notify(new MpdrNotification($data, $notificationType));
             }
         }
     }

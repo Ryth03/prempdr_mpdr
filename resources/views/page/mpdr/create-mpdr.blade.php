@@ -107,7 +107,7 @@
                                 <label class="form-check-label" for="productCategory5">
                                     Others
                                 </label>
-                                <input type="text" class="form-control" name="productCategoryText" placeholder="(Others)">
+                                <input type="text" class="form-control" name="productCategoryText" id="productCategoryText" placeholder="(Others)">
                             </div>
                         </div>
                     </div>
@@ -119,7 +119,7 @@
                                 <label class="form-check-label" for="channel1">
                                 International
                                 </label>
-                                <input type="text" class="form-control" name="country" placeholder="Country">
+                                <input type="text" class="form-control" name="country" id="country" placeholder="Country">
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="channel" id="channel2" value="Regional">
@@ -187,7 +187,7 @@
                             <label class="form-check-label" for="certification3">
                                 Others
                             </label>
-                            <input type="text" class="form-control" name="certificationText" placeholder="(Others)">
+                            <input type="text" class="form-control" name="certificationText" id="certificationText" placeholder="(Others)">
                         </div>
                     </div>
                 </div>
@@ -238,14 +238,14 @@
                                     <label class="form-check-label" for="existingPackaging">
                                     Existing
                                     </label>
-                                    <textarea class="form-control no-resize" name="ExistingPackagingText" placeholder="Details" rows="2"></textarea>
+                                    <textarea class="form-control no-resize" name="ExistingPackagingText" id="ExistingPackagingText" placeholder="Details" rows="2"></textarea>
                                 </div>
                                 <div class="form-check col">
                                     <input class="form-check-input" type="radio" name="packaging" id="newPackaging" value="New">
                                     <label class="form-check-label" for="newPackaging">
                                     New
                                     </label>
-                                    <textarea class="form-control no-resize" name="NewPackagingText" placeholder="Details" rows="2"></textarea>
+                                    <textarea class="form-control no-resize" name="NewPackagingText" id="NewPackagingText" placeholder="Details" rows="2"></textarea>
                                 </div>
                             </div>
                         </li>
@@ -353,6 +353,66 @@
                     // Jika gagal, tampilkan pesan error
                     console.log('Error ketika mengambil approver list');
                     // $('#formData').html('<p>There was an error fetching the data.</p>');
+                }
+            });
+        });
+
+        // mengatur readonly text pada input product category
+        const productCategoryRadios = document.querySelectorAll('input[name="productCategory"]');
+        const productCategoryText = document.getElementById('productCategoryText');
+        productCategoryRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+            if (radio.checked && radio.value == 'Others') {
+                productCategoryText.removeAttribute('readonly');
+            } else {
+                productCategoryText.setAttribute('readonly', true);
+                productCategoryText.value = '';
+            }
+            });
+        });
+
+        // mengatur readonly text pada input channel
+        const channelRadios = document.querySelectorAll('input[name="channel"]');
+        const channelText = document.getElementById('country');
+        channelRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+            if (radio.checked && radio.value == 'International') {
+                channelText.removeAttribute('readonly');
+            } else {
+                channelText.setAttribute('readonly', true);
+                channelText.value = '';
+            }
+            });
+        });
+
+        // mengatur readonly text pada input certification
+        const certificationRadios = document.querySelectorAll('input[name="certification"]');
+        const certificationText = document.getElementById('certificationText');
+        certificationRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+            if (radio.checked && radio.value == 'Others') {
+                certificationText.removeAttribute('readonly');
+            } else {
+                certificationText.setAttribute('readonly', true);
+                certificationText.value = '';
+            }
+            });
+        });
+
+        // mengatur readonly text pada input packaging
+        const packagingRadios = document.querySelectorAll('input[name="packaging"]');
+        packagingRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                var existingPackagingText = document.getElementById('ExistingPackagingText');
+                var newPackagingText = document.getElementById('NewPackagingText');
+                if (radio.checked && radio.value == 'Existing') {
+                    existingPackagingText.removeAttribute('readonly');
+                    newPackagingText.setAttribute('readonly', true);
+                    newPackagingText.value = '';
+                } else {
+                    newPackagingText.removeAttribute('readonly');
+                    existingPackagingText.setAttribute('readonly', true);
+                    existingPackagingText.value = '';
                 }
             });
         });

@@ -168,20 +168,6 @@ Route::middleware('auth')->group(function () {
     });
 
 
-    // =============================================================RS=================================================================
-
-    Route::prefix('rs')->group(function () {
-        Route::get('/', [RequistionSlipController::class, 'index'])->name('rs.index');
-        Route::get('/create', [RequistionSlipController::class, 'create'])->name('rs.create');
-        Route::get('/edit/{id}', [RequistionSlipController::class, 'edit'])->name('rs.edit');
-        Route::patch('/update/{id}', [RequistionSlipController::class, 'update'])->name('rs.update');
-        Route::delete('/destroy/{id}', [RequistionSlipController::class, 'destroy'])->name('rs.destroy');
-        Route::get('/report', [RequistionSlipController::class, 'report'])->name('rs.report');
-        Route::get('/approval', [RequistionSlipController::class, 'approval'])->name('rs.approval');
-        Route::get('/log', [RequistionSlipController::class, 'log'])->name('rs.log');
-    });
-
-
 });
 
 

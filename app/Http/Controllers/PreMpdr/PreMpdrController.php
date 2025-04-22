@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\PREMPDR\PreMpdrForm;
 use App\Models\PREMPDR\PreMpdrRevision;
+use App\Notifications\MpdrNotification;
 
 class PreMpdrController extends Controller
 {
@@ -514,8 +515,17 @@ class PreMpdrController extends Controller
         if($form->route_to){
             $approved_detail = $form->approvedDetail->where('name', $form->route_to)->first();
             $approver = User::where('nik', $approved_detail->approver)->first(); // Approver yang dituju
-    
+            
             ProcessApproval::dispatch($approver, $form, $approved_detail); // send email
+
+            // kirim notif app 
+            $data = [
+                'title' => 'New Pre-MPDR for Approval',
+                'message' => $form->no . ' needs your approval.',
+                'user_id' => $form->user_id,
+            ];
+            $notificationType = 'approval_request'; // Tipe notifikasi yang sesuai
+            $approver->notify(new MpdrNotification($data, $notificationType));
         }
     }
 }

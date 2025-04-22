@@ -15,6 +15,7 @@ use App\Models\PREMPDR\PreMpdrForm;
 use App\Models\PREMPDR\PreMpdrRevision;
 use App\Jobs\PreMpdr\ProcessApproval;
 use App\Jobs\PreMpdr\sendResultToUser;
+use App\Notifications\MpdrNotification;
 
 class PreMpdrApprovalController extends Controller
 {
@@ -131,6 +132,15 @@ class PreMpdrApprovalController extends Controller
             $approver = User::where('nik', $approved_detail->approver)->first(); // Approver yang dituju
     
             ProcessApproval::dispatch($approver, $form, $approved_detail); // send email
+            
+            // kirim notif app 
+            $data = [
+                'title' => 'New Pre-MPDR for Approval',
+                'message' => $form->no . ' needs your approval.',
+                'user_id' => $form->user_id,
+            ];
+            $notificationType = 'approval_request'; // Tipe notifikasi yang sesuai
+            $approver->notify(new MpdrNotification($data, $notificationType));
         }
     }
 
@@ -148,6 +158,15 @@ class PreMpdrApprovalController extends Controller
 
             foreach($allUser as $user){ // Foreach semua user
                 sendResultToUser::dispatch($user,  $form); // send email
+
+                // kirim notif website 
+                $data = [
+                    'title' => 'Pre-MPDR approved',
+                    'message' => $form->no . ' has been approved.',
+                    'user_id' => $form->user_id,
+                ];
+                $notificationType = 'approved'; // Tipe notifikasi yang sesuai
+                $user->notify(new MpdrNotification($data, $notificationType));
             }
         }else if($form->status == 'Rejected'){
             $initiator = User::where('nik', $form->approver->initiator)->first();
@@ -159,6 +178,15 @@ class PreMpdrApprovalController extends Controller
             //foreach initiator dan admin
             foreach($allUser as $user){
                 sendResultToUser::dispatch($user, $form); // send email
+                
+                // kirim notif website 
+                $data = [
+                    'title' => 'Pre-MPDR rejected',
+                    'message' => $form->no . ' has been rejected.',
+                    'user_id' => $form->user_id,
+                ];
+                $notificationType = 'rejected'; // Tipe notifikasi yang sesuai
+                $user->notify(new MpdrNotification($data, $notificationType));
             }
 
         }else if($form->status == 'In Approval'){
