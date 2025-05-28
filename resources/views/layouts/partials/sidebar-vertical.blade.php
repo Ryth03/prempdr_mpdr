@@ -138,6 +138,7 @@
                         <span class="hide-menu">Approval Pre MPDR</span>
                     </a>
                 </li>
+                @if(auth()->user()->hasRole('super-admin'))
                 <li class="sidebar-item">
                     <a class="sidebar-link" href="{{ route('prempdr.log') }}" aria-expanded="false">
                         <span>
@@ -146,6 +147,7 @@
                         <span class="hide-menu">Log Pre MPDR</span>
                     </a>
                 </li>
+                @endif
 
                 <!-- ---------------------------------- -->
                 <!--  MPDR -->
@@ -178,6 +180,7 @@
                         <span class="hide-menu">Approval MPDR</span>
                     </a>
                 </li>
+                @if(auth()->user()->hasRole('super-admin'))
                 <li class="sidebar-item">
                     <a class="sidebar-link" href="{{ route('mpdr.log') }}" aria-expanded="false">
                         <span>
@@ -186,6 +189,7 @@
                         <span class="hide-menu">Log MPDR</span>
                     </a>
                 </li>
+                @endif
                 <li class="sidebar-item">
                     <a class="sidebar-link" href="{{ route('mpdr.approver') }}" aria-expanded="false">
                         <span>

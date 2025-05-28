@@ -352,7 +352,7 @@
 
             // fetch data form
             $.ajax({
-                url: '{{ route('mpdr.form.data') }}', // URL ke controller
+                url: '{{ route('mpdr.print.data') }}', // URL ke controller
                 method: 'GET',
                 data: {
                     no_reg: no_reg

@@ -84,13 +84,13 @@
 
                                         $url = $urlType . '.' . $urlContent;
                                     @endphp
-                                    <button type="button"
+                                    <a 
                                         class="p-3 d-flex align-items-center dropdown-item gap-3 border-bottom mark-as-read"
                                         data-id="{{ $notification->id }}"
-                                        @if (!is_null($urlType) || !is_null($urlContent)) 
-                                            data-url="{{ route($url) }}"
+                                        @if (!is_null($urlType) && !is_null($urlContent)) 
+                                            href="{{ route($url) }}"
                                         @else
-                                            data-url="{{ route('dashboard') }}"
+                                            href="{{ route('dashboard') }}"
                                         @endif>
                                         <span
                                             class="flex-shrink-0 bg-primary-subtle rounded-circle round-40 d-flex align-items-center justify-content-center fs-6 text-primary">
@@ -106,7 +106,7 @@
                                                 {{ substr($notification->data['data']['message'], 0, 40) }}...
                                             </span>
                                         </div>
-                                    </button>
+                                    </a>
                                 @endforeach
                                 </div>
                                 <div class="py-6 px-7 mb-1">

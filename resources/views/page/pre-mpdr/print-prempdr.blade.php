@@ -367,17 +367,15 @@
             makeAllReadonly();
 
             const no_reg = @json($no_reg);
-            console.log("MELAKUKAN FETCH DATA:", no_reg);
 
             // fetch data form
             $.ajax({
-                url: '{{ route('prempdr.form.data') }}', // URL ke controller
+                url: '{{ route('prempdr.print.data') }}', // URL ke controller
                 method: 'GET',
                 data: {
                     no_reg: no_reg
                 },
                 success: function(response) {
-                    console.log("berhasil mengambil data", response);
                     // No_Reg
                     $('#no_reg_text').text(no_reg);
                     

@@ -94,23 +94,30 @@
                 { data: null, name: 'action', orderable: false, searchable: false, 
                     render: function(data, type, row) {
                         if (data.status === 'Draft') {
-                            const editRoute = "{{ route('prempdr.edit', ':formId') }}".replace(':formId', row.no);
-                            const deleteRoute = "{{ route('prempdr.destroy', ':formId') }}".replace(':formId', row.no);
+                            if(data.user_id === {{auth()->id()}}){
+                                const editRoute = "{{ route('prempdr.edit', ':formId') }}".replace(':formId', row.no);
+                                const deleteRoute = "{{ route('prempdr.destroy', ':formId') }}".replace(':formId', row.no);
 
-                            return `
-                            <div class="d-flex gap-6">
-                                <a href="${editRoute}" class="btn btn-outline-primary" >Edit Form</a>
-                                <form id="delete-form-${row.no}" action="${deleteRoute}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <a href="javascript:void(0)" class="btn btn-outline-danger" data-form-no="${row.no}" onClick="confirmDelete(this)">
-                                        <i class="ti ti-trash"></i>
-                                    </a>
-                                </form>
-                            </div>
-                            `;
+                                return `
+                                <div class="d-flex gap-6">
+                                    <a href="${editRoute}" class="btn btn-outline-primary" >Edit Form</a>
+                                    <form id="delete-form-${row.no}" action="${deleteRoute}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <a href="javascript:void(0)" class="btn btn-outline-danger" data-form-no="${row.no}" onClick="confirmDelete(this)">
+                                            <i class="ti ti-trash"></i>
+                                        </a>
+                                    </form>
+                                </div>
+                                `;
+                            }
+                            else
+                            {
+                                return '';
+                            }
+                            
                         } else {
                             const route = "{{ route('prempdr.form', ':formId') }}";
                             const url = route.replace(':formId', row.no);

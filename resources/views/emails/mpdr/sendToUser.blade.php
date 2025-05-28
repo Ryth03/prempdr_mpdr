@@ -163,24 +163,31 @@
                     <td>TARGET LAUNCH (as Initiator request):</td>
                     <td>{{ $form->detail->target_launch ?? '' }}</td>
                 </tr>
-                <tr class="tr-odd">
-                    <th>Approved by,</th>
-                    <td></td>
-                </tr>
-                @foreach($form->approvedDetail as $index => $approvedDetail)
-                <tr  class="{{ $index % 2 != 0 ? 'tr-odd' : '' }}">
-                    <td>{{ $approvedDetail->approver_name }}</td>
-                    <td>
-                        <p style="{{$approvedDetail->status == 'approve' ? 'color: green;' : ($approvedDetail->status == 'approve with review' ? 'color: orange;' : 'color: red;')}}">{{ $approvedDetail->status }} {{$approvedDetail->approved_date !== null ? '('.$approvedDetail->approved_date.')' : ''}}</p>
-                        <p>{{$approvedDetail->comment}}</p>
-                    </td>
-                </tr>
-                @endforeach
+
+                
+                @if($form->status !== 'Approved')
+                    <tr class="tr-odd">
+                        <th>Approved by,</th>
+                        <td></td>
+                    </tr>
+
+                    @foreach($form->approvedDetail as $index => $approvedDetail)
+                        <tr  class="{{ $index % 2 != 0 ? 'tr-odd' : '' }}">
+                            <td>{{ $approvedDetail->approver_name }}</td>
+                            <td>
+                                <p style="{{$approvedDetail->status == 'approve' ? 'color: green;' : ($approvedDetail->status == 'approve with review' ? 'color: orange;' : 'color: red;')}}">{{ $approvedDetail->status }} {{$approvedDetail->approved_date !== null ? '('.$approvedDetail->approved_date.')' : ''}}</p>
+                                <p>{{$approvedDetail->comment}}</p>
+                            </td>
+                        </tr>
+                    @endforeach
+                @endif
 
                 <tr>
                     <td colspan="2">
                         @if($form->status == 'Approved')
                             <p style="text-align: center;">Thank you for your cooperation, and we wish you a safe and successful completion of your tasks.</p>
+                            <p style="text-align: center;">Please use the following link to download the approved document:</p>
+                            <p style="text-align: center;"><a href="{{$downloadLink}}" target="_blank">Download Approved Form</a></p>
                         @elseif($form->status == 'Rejected')
                             <p style="text-align: center;">We appreciate your understanding and look forward to your revised submission.</p>
                         @endif

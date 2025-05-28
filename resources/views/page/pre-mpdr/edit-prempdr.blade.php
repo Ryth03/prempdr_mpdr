@@ -93,24 +93,24 @@
                                 Pastry
                                 </label>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="productCategory" id="Others" value="Others">
-                                <label class="form-check-label" for="Others">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input me-2" type="radio" name="productCategory" id="Others" value="Others">
+                                <label class="form-check-label me-2" for="Others">
                                     Others
                                 </label>
-                                <input type="text" class="form-control" name="productCategoryText" id="productCategoryText">
+                                <input type="text" class="form-control w-30" name="productCategoryText" id="productCategoryText">
                             </div>
                         </div>
                     </div>
                     <div id="channel" class="col">
                         <label class="form-label">Channel:</label>
                         <div class="">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="channel" id="International" value="International" required>
-                                <label class="form-check-label" for="International">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input me-2" type="radio" name="channel" id="International" value="International" required>
+                                <label class="form-check-label me-2" for="International">
                                 International
                                 </label>
-                                <input type="text" class="form-control" name="country" id="country">
+                                <input type="text" class="form-control w-30" name="country" id="country">
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="channel" id="Regional" value="Regional">
@@ -173,12 +173,12 @@
                             HALAL
                             </label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certification" id="certificationOthers" value="Others">
-                            <label class="form-check-label" for="Others">
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input me-2" type="radio" name="certification" id="certificationOthers" value="Others">
+                            <label class="form-check-label me-2" for="Others">
                                 Others
                             </label>
-                            <input type="text" class="form-control" id="certificationText" name="certificationText" placeholder="(Others)">
+                            <input type="text" class="form-control w-30" id="certificationText" name="certificationText" placeholder="(Others)">
                         </div>
                     </div>
                 </div>
@@ -474,7 +474,6 @@
                     $('#targetLaunch').val(response.detail.target_launch);
 
                     $(`[id="${response.category.category}"]`).prop('checked', true).prop('disabled', false).trigger('change');
-                    console.log('Trigger dijalankan untuk ID:', response.category.category);
                     $('#productCategoryText').val(response.category.other);
 
                     $(`#${response.channel.category}`).prop('checked', true).prop('disabled', false).trigger('change');

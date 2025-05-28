@@ -111,24 +111,24 @@
                                 Pastry
                                 </label>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="productCategory" id="Others" value="Others">
-                                <label class="form-check-label" for="productCategory5">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input me-2" type="radio" name="productCategory" id="Others" value="Others">
+                                <label class="form-check-label me-2" for="productCategory5">
                                     Others
                                 </label>
-                                <input type="text" class="form-control" name="productCategoryText" placeholder="(Others)">
+                                <input type="text" class="form-control w-30" name="productCategoryText" id="productCategoryText" placeholder="(Others)">
                             </div>
                         </div>
                     </div>
                     <div id="channel" class="col">
                         <label class="form-label">Channel:</label>
                         <div class="">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="channel" id="International" value="International" required>
-                                <label class="form-check-label" for="channel1">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input me-2" type="radio" name="channel" id="International" value="International" required>
+                                <label class="form-check-label me-2" for="channel1">
                                 International
                                 </label>
-                                <input type="text" class="form-control" name="country" id="country" placeholder="Country">
+                                <input type="text" class="form-control w-30" name="country" id="country" placeholder="Country">
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="channel" id="Regional" value="Regional">
@@ -191,12 +191,12 @@
                             HALAL
                             </label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certification" id="certificationOthers" value="Others">
-                            <label class="form-check-label" for="certification3">
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input me-2" type="radio" name="certification" id="certificationOthers" value="Others">
+                            <label class="form-check-label me-2" for="certification3">
                                 Others
                             </label>
-                            <input type="text" class="form-control" name="certificationText" placeholder="(Others)">
+                            <input type="text" class="form-control w-30" name="certificationText" id="certificationText" placeholder="(Others)">
                         </div>
                     </div>
                 </div>
@@ -360,7 +360,7 @@
         function radiosOnChanges() {
             // mengatur readonly text pada input product category
             $('input[name="productCategory"]').on('change', function () {
-                const productCategoryText = $('#productCategoryText');
+                var productCategoryText = $('#productCategoryText');
 
                 if ($(this).is(':checked') && $(this).val() === 'Others') {
                     productCategoryText.removeAttr('readonly');
@@ -371,7 +371,7 @@
 
             // Mengatur readonly text pada input channel
             $('input[name="channel"]').on('change', function () {
-                const channelText = $('#country');
+                var channelText = $('#country');
                 if ($(this).is(':checked') && $(this).val() === 'International') {
                     channelText.removeAttr('readonly');
                 } else {
@@ -381,7 +381,7 @@
 
             // mengatur readonly text pada input certification
             $('input[name="certification"]').on('change', function () {
-                const certificationText = $('#certificationText');
+                var certificationText = $('#certificationText');
 
                 if ($(this).is(':checked') && $(this).val() === 'Others') {
                     certificationText.removeAttr('readonly');

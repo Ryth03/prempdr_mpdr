@@ -102,24 +102,24 @@
                                 Pastry
                                 </label>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="productCategory" id="productCategory5" value="Others">
-                                <label class="form-check-label" for="productCategory5">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input me-2" type="radio" name="productCategory" id="productCategory5" value="Others">
+                                <label class="form-check-label me-2" for="productCategory5">
                                     Others
                                 </label>
-                                <input type="text" class="form-control" name="productCategoryText" id="productCategoryText" placeholder="(Others)">
+                                <input type="text" class="form-control w-30" name="productCategoryText" id="productCategoryText" placeholder="(Others)" readonly>
                             </div>
                         </div>
                     </div>
                     <div id="channel" class="col">
                         <label class="form-label">Channel:</label>
                         <div class="">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="channel" id="channel1" value="International" required>
-                                <label class="form-check-label" for="channel1">
+                            <div class="form-check d-flex align-items-center">
+                                <input class="form-check-input me-2" type="radio" name="channel" id="channel1" value="International" required>
+                                <label class="form-check-label me-2" for="channel1">
                                 International
                                 </label>
-                                <input type="text" class="form-control" name="country" id="country" placeholder="Country">
+                                <input type="text" class="form-control w-30" name="country" id="country" placeholder="Country" readonly>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="channel" id="channel2" value="Regional">
@@ -182,12 +182,12 @@
                             HALAL
                             </label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="certification" id="certification3" value="Others">
-                            <label class="form-check-label" for="certification3">
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input me-2" type="radio" name="certification" id="certification3" value="Others">
+                            <label class="form-check-label me-2" for="certification3">
                                 Others
                             </label>
-                            <input type="text" class="form-control" name="certificationText" id="certificationText" placeholder="(Others)">
+                            <input type="text" class="form-control w-30" name="certificationText" id="certificationText" placeholder="(Others)" readonly>
                         </div>
                     </div>
                 </div>
@@ -238,14 +238,14 @@
                                     <label class="form-check-label" for="existingPackaging">
                                     Existing
                                     </label>
-                                    <textarea class="form-control no-resize" name="ExistingPackagingText" id="ExistingPackagingText" placeholder="Details" rows="2"></textarea>
+                                    <textarea class="form-control no-resize" name="ExistingPackagingText" id="ExistingPackagingText" placeholder="Details" rows="2" readonly></textarea>
                                 </div>
                                 <div class="form-check col">
                                     <input class="form-check-input" type="radio" name="packaging" id="newPackaging" value="New">
                                     <label class="form-check-label" for="newPackaging">
                                     New
                                     </label>
-                                    <textarea class="form-control no-resize" name="NewPackagingText" id="NewPackagingText" placeholder="Details" rows="2"></textarea>
+                                    <textarea class="form-control no-resize" name="NewPackagingText" id="NewPackagingText" placeholder="Details" rows="2" readonly></textarea>
                                 </div>
                             </div>
                         </li>

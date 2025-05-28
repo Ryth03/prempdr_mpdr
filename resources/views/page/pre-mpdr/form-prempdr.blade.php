@@ -123,24 +123,24 @@
                             Pastry
                             </label>
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="productCategory" id="Others">
-                            <label class="form-check-label" for="Others">
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input me-2" type="radio" name="productCategory" id="Others">
+                            <label class="form-check-label me-2" for="Others">
                                 Others
                             </label>
-                            <input type="text" class="form-control" name="productCategoryText" id="productCategoryText">
+                            <input type="text" class="form-control w-30" name="productCategoryText" id="productCategoryText">
                         </div>
                     </div>
                 </div>
                 <div id="channel" class="col">
                     <label class="form-label">Channel:</label>
                     <div class="">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="channel" id="International">
-                            <label class="form-check-label" for="International">
+                        <div class="form-check d-flex align-items-center">
+                            <input class="form-check-input me-2" type="radio" name="channel" id="International">
+                            <label class="form-check-label me-2" for="International">
                             International
                             </label>
-                            <input type="text" class="form-control" name="country" id="country">
+                            <input type="text" class="form-control w-30" name="country" id="country">
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="channel" id="Regional">
@@ -203,12 +203,12 @@
                         HALAL
                         </label>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="certification" id="Others">
-                        <label class="form-check-label" for="Others">
+                    <div class="form-check d-flex align-items-center">
+                        <input class="form-check-input me-2" type="radio" name="certification" id="Others">
+                        <label class="form-check-label me-2" for="Others">
                             Others
                         </label>
-                        <input type="text" class="form-control" id="certificationText" name="certificationText">
+                        <input type="text" class="form-control w-30" id="certificationText" name="certificationText">
                     </div>
                 </div>
             </div>
